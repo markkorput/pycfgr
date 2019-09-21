@@ -7,7 +7,6 @@ from cfgr import Runtime, Type, Instance, Json
 class Product:
   def __init__(self):
     self.name = ''
-    self.nameChangedEvent = Event()
     self.afterResetEvent = Event()
     self.parent = None
 
@@ -16,7 +15,6 @@ class Product:
       return
 
     self.name = v
-    self.nameChangedEvent(self.name)
 
   def setParent(self, product):
     self.parent = product
@@ -30,8 +28,6 @@ class Product:
     by default, the Runtime.add_type(<Type>) method will look for a static cfgr method.
     """
     builder.addInput('name').string(lambda v,obj: obj.setName(v))
-    #builder.addOutput('nameChanged').apply(lambda outp,obj: obj.nameChangedEvent.subscribe(outp.event))
-    builder.addOutput('nameChanged').connect(lambda obj: obj.nameChangedEvent)
     #builder.addInput('reset').apply(lambda inp,obj: inp.event.subscribe(obj.reset))
     builder.addInput('reset').connect(lambda obj: obj.reset)
     builder.addOutput('afterReset').connect(lambda obj: obj.afterResetEvent)

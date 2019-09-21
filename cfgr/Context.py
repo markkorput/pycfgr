@@ -42,9 +42,9 @@ class Context:
       attr_data = data[v]
 
       if input:
-        self.apply_input(input, attr_data, runtime=self.runtime)
+        self.apply_input(input, attr_data)
       elif output:
-        self.apply_output(output, attr_data, runtime=self.runtime)
+        self.apply_output(output, attr_data)
       elif v == 'inputs':
         self.apply_inputs(instance, attr_data)
       elif v == 'outputs':
@@ -58,26 +58,17 @@ class Context:
   def apply_outputs(self, instance, output_data):
     pass
 
-  def apply_input(self, port, data, runtime):
+  def apply_input(self, port, data):
     if (data.startswith('#')):
-      if not runtime:
-        print("Don't have runtime to apply event input")
-        return
-
       e = self.runtime.get_event(data)
       e.subscribe(port.event.fire)
       return
 
     port.event.fire(data)
 
-  def apply_output(self, port, data, runtime):
-
+  def apply_output(self, port, data):
     if not is_event_data(data):
       print('Unsupported output data, events should be prefixed with a hash symbol (#) and can be comma-separarted')
-      return
-
-    if not runtime:
-      print("Don't have runtime to apply event input")
       return
 
     events = self.get_events(data)
