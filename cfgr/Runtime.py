@@ -1,6 +1,6 @@
 from .Type import Type
 from .TypeBuilder import TypeBuilder
-
+from evento import Event
 
 def _portDefsFromClass(typeClass):
   """
@@ -21,6 +21,7 @@ class Runtime:
   def __init__(self):
     self.types = []
     self.instances = []
+    self.events = {}
 
   def add_type(self, typeId=None, typeClass=None):
     if not typeId:
@@ -48,3 +49,12 @@ class Runtime:
 
   def remove_instance(self, instance):
     self.instances.remove(instance)
+
+  def getEvent(self, id):
+    if id in self.events:
+      return self.events[id]
+
+    e = Event()
+    self.events[id] = e
+    return e
+    
