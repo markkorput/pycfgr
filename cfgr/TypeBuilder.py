@@ -1,4 +1,4 @@
-from .PortBuilder import PortBuilder
+from .PortBuilder import OutputBuilder, InputBuilder
 from .Port import Port
 
 class TypeBuilder:
@@ -6,12 +6,12 @@ class TypeBuilder:
     self.portDefs = []
 
   def addInput(self, id):
-    portbuilder = PortBuilder(id, Port.INPUT)
+    portbuilder = InputBuilder(id)
     self.portDefs.append(portbuilder.portDef)
     return portbuilder
 
   def addOutput(self, id):
-    portbuilder = PortBuilder(id, Port.OUTPUT)
+    portbuilder = OutputBuilder(id)
     self.portDefs.append(portbuilder.portDef)
     return portbuilder
 

@@ -8,10 +8,13 @@ class Type:
 
     builder = TypeBuilder()
 
-    if not buildFunc:
-      buildFunc = typeClass.build
-
-    buildFunc(builder)
+    if not buildFunc and hasattr(typeClass, 'cfgr'):
+      buildFunc = typeClass.cfgr
+    
+    if buildFunc:
+      buildFunc(builder)
+    else:
+      print("no build func for type: {}".format(typeId))
 
     self.portDefs = builder.getPortDefs()
 

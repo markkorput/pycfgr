@@ -24,8 +24,31 @@ class PortBuilder:
   def apply(self, func):
     self.portDef.applyFuncs.append(func)
 
+
+class InputBuilder(PortBuilder):
+  def __init__(self, id):
+    PortBuilder.__init__(self, id, Port.INPUT)
+
   def string(self, stringFunc):
-    # class StringApply:
-      # def apply(self, )
     applyFunc = lambda port, obj: port.event.subscribe(lambda v: stringFunc(v, obj))
+    self.apply(applyFunc)
+
+  def connect(self, connectFunc):
+    """
+    uses the connectFunc to fetch a method from our object
+    which will be fires when the port's event is fired
+    """
+    applyFunc = lambda port, obj: port.event.subscribe(connectFunc(obj))
+    self.apply(applyFunc)
+
+class OutputBuilder(PortBuilder):
+  def __init__(self, id):
+    PortBuilder.__init__(self, id, Port.OUTPUT)
+
+  def connect(self, eventFromObjectFunc):
+    """
+    uses the func to fetch an event from our object
+    which will be forwarded by this output's event
+    """
+    applyFunc = lambda port, obj: eventFromObjectFunc(obj).subscribe(port.event)
     self.apply(applyFunc)

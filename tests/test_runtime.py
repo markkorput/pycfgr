@@ -8,9 +8,6 @@ class Product:
     self.name = ''
     self.nameChangedEvent = Event()
 
-  def cfgr():
-    return lambda x: print(x)
-
   def setName(self, v):
     if v == self.name:
       return
@@ -18,13 +15,24 @@ class Product:
     self.name = v
     self.nameChangedEvent(self.name)
 
-  def build(builder):
+  def reset(self):
+    self.setName('')
+
+  def cfgr(builder):
+    """
+    by default, the Runtime.add_type(<Type>) method will look for a static cfgr method.
+    (see the cfgr.Type class)
+    """
     builder.addInput('name').string(lambda v,obj: obj.setName(v))
-    builder.addOutput('nameChanged').apply(lambda outp,obj: obj.nameChangedEvent.subscribe(outp.event))
+    #builder.addOutput('nameChanged').apply(lambda outp,obj: obj.nameChangedEvent.subscribe(outp.event))
+    builder.addOutput('nameChanged').connect(lambda obj: obj.nameChangedEvent)
+    #builder.addInput('reset').apply(lambda inp,obj: inp.event.subscribe(obj.reset))
+    builder.addInput('reset').connect(lambda obj: obj.reset)
+    
 
 
 class TestRuntime(TestCase):
-  def test_simple_type(self):
+  def test_simple_product_type(self):
     # create runtime
     runtime = Runtime()
 
@@ -54,3 +62,8 @@ class TestRuntime(TestCase):
     self.assertEquals(catches, [])
     inst.input('name').event('2nd name')
     self.assertEquals(catches, ['2nd name'])
+
+    # verify the reset input resets the product's name
+    inst.input('reset').event()
+    self.assertEquals(inst.object.name, '')
+    self.assertEquals(catches, ['2nd name', ''])
