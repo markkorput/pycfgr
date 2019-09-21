@@ -37,7 +37,7 @@ class TestRuntime(TestCase):
 
     # create Product type
     self.assertEquals(runtime.types, [])
-    typ = runtime.add_type(Product)
+    typ = runtime.add_type(typeClass=Product)
     self.assertEquals(runtime.types, [typ])
 
     # create instance of Product type
@@ -66,3 +66,7 @@ class TestRuntime(TestCase):
     inst.input('reset').event()
     self.assertEquals(inst.object.name, '')
     self.assertEquals(catches, ['2nd name', ''])
+
+    # cleanup
+    runtime.remove_instance(inst)
+    self.assertEquals(runtime.instances, [])

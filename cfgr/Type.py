@@ -1,14 +1,10 @@
-from .TypeBuilder import TypeBuilder
 from .Instance import Instance
 
 class Type:
-  def __init__(self, typeId, createFunc, cfgrFunc):
+  def __init__(self, typeId, portDefs, createFunc):
     self.typeId = typeId
     self.createFunc = createFunc
-
-    builder = TypeBuilder()
-    cfgrFunc(builder)
-    self.portDefs = builder.getPortDefs()
+    self.portDefs = portDefs
 
   def create_instance(self):
     obj = self.createFunc()
