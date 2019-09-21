@@ -8,4 +8,5 @@ setup(name='cfgr',
   author_email='shortnotion@gmail.com',
   license='MIT',
   packages=['cfgr'],
+  install_requires=['evento'],
   zip_safe=False)
