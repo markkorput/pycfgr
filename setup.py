@@ -9,4 +9,6 @@ setup(name='cfgr',
   license='MIT',
   packages=['cfgr'],
   install_requires=['evento'],
+  test_suite='nose.collector',
+  tests_require=['nose'],
   zip_safe=False)
