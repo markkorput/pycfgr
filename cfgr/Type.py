@@ -2,24 +2,16 @@ from .TypeBuilder import TypeBuilder
 from .Instance import Instance
 
 class Type:
-  def __init__(self, typeId, typeClass, buildFunc=None):
+  def __init__(self, typeId, createFunc, cfgrFunc):
     self.typeId = typeId
-    self.typeClass = typeClass
+    self.createFunc = createFunc
 
     builder = TypeBuilder()
-
-    if not buildFunc and hasattr(typeClass, 'cfgr'):
-      buildFunc = typeClass.cfgr
-    
-    if buildFunc:
-      buildFunc(builder)
-    else:
-      print("no build func for type: {}".format(typeId))
-
+    cfgrFunc(builder)
     self.portDefs = builder.getPortDefs()
 
   def create_instance(self):
-    obj = self.typeClass()
+    obj = self.createFunc()
 
     ports = []
     for portdef in self.portDefs:

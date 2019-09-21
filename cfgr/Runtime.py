@@ -6,7 +6,15 @@ class Runtime:
     self.instances = []
 
   def create_type(self, typeId, typeClass):
-    typ = Type(typeId, typeClass)
+    if not hasattr(typeClass, 'cfgr'):
+      print("no build func for type: {}".format(typeId))
+      return None
+
+    # default create-object-instance-func; simply call constructor
+    createFunc = typeClass
+    # default builder func: a static cfgr method
+    cfgrFunc = typeClass.cfgr
+    typ = Type(typeId, createFunc, cfgrFunc)
     self.types.append(typ)
     return typ
 

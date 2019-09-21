@@ -21,7 +21,6 @@ class Product:
   def cfgr(builder):
     """
     by default, the Runtime.add_type(<Type>) method will look for a static cfgr method.
-    (see the cfgr.Type class)
     """
     builder.addInput('name').string(lambda v,obj: obj.setName(v))
     #builder.addOutput('nameChanged').apply(lambda outp,obj: obj.nameChangedEvent.subscribe(outp.event))
