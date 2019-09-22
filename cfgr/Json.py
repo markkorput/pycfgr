@@ -3,7 +3,7 @@ import re
 from .Context import Context
 
 class Loader:
-  def __init__(self, runtime, data=None, json=None, file=None, verbose=False):
+  def __init__(self, runtime, data=None, text=None, file=None, verbose=False):
     self.context = Context(runtime, verbose=verbose)
     self.data = data
 
@@ -11,10 +11,14 @@ class Loader:
       if file:
         if verbose: print('Loading json file: {}'.format(file))
         with open(file, "r") as f:
-          json = f.read()
+          text = f.read()
 
-      if json:
-        self.data = jsonlib.loads(json) 
+      if text:
+        self.data = jsonlib.loads(text) 
+
+      if not self.data:
+        self.data = {}
+
 
   def create(self, id, recursive=True):
     instance_data = self.data[id] if id in self.data else {}

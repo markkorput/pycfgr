@@ -46,9 +46,9 @@ class TestJson(TestCase):
     # create runtime
     runtime = Runtime()
     # create Product type
-    typ = runtime.add_type(typeClass=Product, json=json_text)
+    typ = runtime.add_type(typeClass=Product)
     
-    loader = Json.Loader(runtime=runtime, data=data)
+    loader = Json.Loader(runtime=runtime, text=json_text)
 
     inst1 = loader.create("Product_1")
     inst2 = loader.create("Product_2")
