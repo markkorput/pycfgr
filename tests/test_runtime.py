@@ -18,6 +18,7 @@ class Product:
   def reset(self):
     self.setName('')
 
+  @staticmethod
   def cfgr(builder):
     """
     by default, the Runtime.add_type(<Type>) method will look for a static cfgr method.
