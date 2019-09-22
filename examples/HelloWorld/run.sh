@@ -1,2 +1,2 @@
-python -m cfgr.app --create app --start-event \#startApp # --data cfgr.json (default)
+python -m cfgr.app # --data cfgr.json --create App --start-event \#appstarted
  

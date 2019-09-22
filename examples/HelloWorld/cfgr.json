@@ -1,5 +1,5 @@
 {
-  "App": {"started":"#appstarted", "stop":"#stopapp"},
+  "App": {"started_":"#appstarted", "stop":"#stopapp"},
   "App.String": {"value": "Hello World!", "in-emit":"#appstarted", "out-emit":"#sayhello,#stopapp"},
   "App.Print": {"on": "#sayhello"}
 }
