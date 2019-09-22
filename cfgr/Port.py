@@ -4,9 +4,10 @@ class Port:
   INPUT = 1
   OUTPUT = 2
 
-  def __init__(self, id, flags):
+  def __init__(self, id, flags, tools):
     self._id = id
     self.flags = flags
+    self.tools = tools
 
     self.event = Event()
 

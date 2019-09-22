@@ -6,9 +6,9 @@ class PortDef:
     self.flags = flags
     self.applyFuncs = []
 
-  def createPortFor(self, object):
+  def createPortFor(self, object, tools):
     # create port
-    p = Port(self._id, self.flags)
+    p = Port(self._id, self.flags, tools)
 
     # perform all logic of connecting the port to the given object
     for func in self.applyFuncs:
@@ -40,6 +40,13 @@ class InputBuilder(PortBuilder):
     """
     applyFunc = lambda port, obj: port.event.subscribe(connectFunc(obj))
     self.apply(applyFunc)
+  
+  def object(self, valueObjectFunc):
+    def applyfunc(port, obj):
+      valfunc = lambda val: valueObjectFunc(port.tools.getObject(val), obj)
+      port.event.subscribe(valfunc)
+
+    self.apply(applyfunc)
 
 class OutputBuilder(PortBuilder):
   def __init__(self, id):

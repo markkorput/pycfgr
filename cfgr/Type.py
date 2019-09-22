@@ -6,12 +6,12 @@ class Type:
     self.createFunc = createFunc
     self.portDefs = portDefs
 
-  def create_instance(self):
+  def create_instance(self, tools):
     obj = self.createFunc()
 
     ports = []
     for portdef in self.portDefs:
-      port = portdef.createPortFor(obj)
+      port = portdef.createPortFor(obj, tools)
       ports.append(port)
 
     inst = Instance(obj, ports)

@@ -1,6 +1,7 @@
+from evento import Event
 from .Type import Type
 from .TypeBuilder import TypeBuilder
-
+from .PortTools import PortTools
 
 def _portDefsFromClass(typeClass):
   """
@@ -22,6 +23,12 @@ class Runtime:
     self.types = []
     self.instances = []
 
+    self.idInstances = {}
+    self.events = {}
+
+    # PortTools is a collection of interfaces that ports can use to fetch specific types of data
+    self.port_tools = PortTools(objectFunc=lambda val: self.getObject(val))
+
   def add_type(self, typeId=None, typeClass=None):
     if not typeId:
       typeId = typeClass.__name__
@@ -37,14 +44,29 @@ class Runtime:
     self.types.append(typ)
     return typ
 
-  def create_instance(self, typeId):
+  def create_instance(self, typeId, instanceId=None):
     for typ in self.types:
       if typ.typeId == typeId:
-        inst = typ.create_instance()
+        inst = typ.create_instance(self.port_tools)
         self.instances.append(inst)
+
+        if instanceId:
+          self.idInstances[instanceId] = inst
+
         return inst
 
     return None
 
   def remove_instance(self, instance):
     self.instances.remove(instance)
+
+  def get_event(self, id):
+    if id in self.events:
+      return self.events[id]
+
+    e = Event()
+    self.events[id] = e
+    return e
+
+  def getObject(self, id):
+    return self.idInstances[id].object if id in self.idInstances else None

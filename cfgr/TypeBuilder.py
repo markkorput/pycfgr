@@ -2,8 +2,9 @@ from .PortBuilder import OutputBuilder, InputBuilder
 from .Port import Port
 
 class TypeBuilder:
-  def __init__(self):
+  def __init__(self, context=None):
     self.portDefs = []
+    self.context = context
 
   def addInput(self, id):
     portbuilder = InputBuilder(id)
