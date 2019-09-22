@@ -48,7 +48,7 @@ class TestRuntime(TestCase):
 
     # verify we received an Instance with a Product object
     self.assertEquals(type(inst), type(Instance(None, None)))
-    self.assertEquals(type(inst.object), Product)
+    self.assertEquals(type(inst.object), type(Product()))
 
     # verify the 'name' input updates the Product's name    
     self.assertEquals(inst.object.name, '')
