@@ -1,4 +1,4 @@
 {
-  "app.String": {"value": "Hello World!", "in-emit":"#startApp", "out-emit":"#hello"},
-  "app.Print": {"on": "#hello"}
+  "App.String": {"value": "Hello World!", "in-emit":"#startApp", "out-emit":"#hello,#stopApp"},
+  "App.Print": {"on": "#hello"}
 }

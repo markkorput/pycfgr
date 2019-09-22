@@ -8,4 +8,4 @@ class Print:
   @staticmethod
   def cfgr(builder):
     ## outputs
-    builder.addInput('on').string_to_method(lambda val,obj: obj.print)
+    builder.addInput('on').string_to_method(lambda obj: obj.print)

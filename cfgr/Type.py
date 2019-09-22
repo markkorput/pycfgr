@@ -11,6 +11,7 @@ class Type:
 
     ports = []
     for portdef in self.portDefs:
+      # print('Type.create_instance.portdef: {}.{}'.format(self.typeId, portdef._id))
       port = portdef.createPortFor(obj, tools)
       ports.append(port)
 
