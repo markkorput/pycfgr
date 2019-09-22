@@ -17,10 +17,10 @@ class String:
 
   @staticmethod
   def cfgr(builder):
-    ## outputs
+    # inputs
     builder.addInput('value').string(lambda val,obj: obj.setValue(val))
     builder.addInput('emit').connect_to_method(lambda obj: obj.emit)
 
-    ## outputs
+    # outputs
     # builder.addOutput('emit').connect(lambda port, obj: obj.emitEvent.subscribe(port.event.fire()))
     builder.addOutput('emit').connect_to_event(lambda obj: obj.emitEvent)

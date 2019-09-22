@@ -33,17 +33,29 @@ class InputBuilder(PortBuilder):
     applyFunc = lambda port, obj: port.event.subscribe(lambda v: stringFunc(v, obj))
     self.apply(applyFunc)
 
+  def float_to_method(self, objMethodFunc):
+    applyFunc = lambda port, obj: port.event.subscribe(objMethodFunc(obj))
+    self.apply(applyFunc)
+
   def connect(self, objMethodFunc):
     self.connect_to_method(objMethodFunc)
 
   def connect_to_method(self, objMethodFunc):
     """
-    uses the connectFunc to fetch a method from our object
-    which will be fires when the port's event is fired
+    uses the objMethodFunc to fetch a method from our object
+    which will be invoked when the port's event is fired
     """
     applyFunc = lambda port, obj: port.event.subscribe(objMethodFunc(obj))
     self.apply(applyFunc)
   
+  def connect_to_event(self, objEventFunc):
+    """
+    uses the objEventFunc to fetch an event from our object
+    which will be fired when the port's event is fired
+    """
+    applyFunc = lambda port, obj: port.event.subscribe(objEventFunc(obj).fire)
+    self.apply(applyFunc)  
+
   def object(self, valueObjectFunc):
     def applyfunc(port, obj):
       valfunc = lambda val: valueObjectFunc(port.tools.getObject(val), obj)
