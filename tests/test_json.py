@@ -29,8 +29,8 @@ class Product:
     """
     builder.addInput('name').string(lambda v,obj: obj.setName(v))
     #builder.addInput('reset').apply(lambda inp,obj: inp.event.subscribe(obj.reset))
-    builder.addInput('reset').connect(lambda obj: obj.reset)
-    builder.addOutput('afterReset').connect(lambda obj: obj.afterResetEvent)
+    builder.addInput('reset').signal_to_method(lambda obj: obj.reset)
+    builder.addOutput('afterReset').from_event(lambda obj: obj.afterResetEvent)
 
     builder.addInput('parent').object(lambda v,obj: obj.setParent(v))
 

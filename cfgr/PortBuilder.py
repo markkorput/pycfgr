@@ -62,24 +62,9 @@ class InputBuilder(PortBuilder):
     applyFunc = lambda port, obj: port.tools.converter(port.event).onFloat(objMethodFunc(obj))
     self.apply(applyFunc)
 
-  def connect(self, objMethodFunc):
-    self.connect_to_method(objMethodFunc)
-
-  def connect_to_method(self, objMethodFunc):
-    """
-    uses the objMethodFunc to fetch a method from our object
-    which will be invoked when the port's event is fired
-    """
-    applyFunc = lambda port, obj: port.event.subscribe(objMethodFunc(obj))
+  def signal_to_method(self, objMethodFunc):
+    applyFunc = lambda port, obj: port.tools.converter(port.event).onFired(objMethodFunc(obj))
     self.apply(applyFunc)
-  
-  def connect_to_event(self, objEventFunc):
-    """
-    uses the objEventFunc to fetch an event from our object
-    which will be fired when the port's event is fired
-    """
-    applyFunc = lambda port, obj: port.event.subscribe(objEventFunc(obj).fire)
-    self.apply(applyFunc)  
 
   def object(self, valueObjectFunc):
     def applyfunc(port, obj):
@@ -88,21 +73,34 @@ class InputBuilder(PortBuilder):
 
     self.apply(applyfunc)
 
-  def string_to_method(self, objMethodFunc):
-    # TODO; perform string payload validation
-    self.connect_to_method(objMethodFunc)
+  def object_to_method(self, objMethodFunc):
+    def applyfunc(port, obj):
+      method = objMethodFunc(obj)
+      valfunc = lambda val: method(port.tools.getObject(val))
+      port.event.subscribe(valfunc)
+
+    self.apply(applyfunc)
+
 
 class OutputBuilder(PortBuilder):
   def __init__(self, id):
     PortBuilder.__init__(self, id, Port.OUTPUT)
 
-  def connect(self, eventFromObjectFunc):
-    self.connect_to_event(eventFromObjectFunc)
-
-  def connect_to_event(self, eventFromObjectFunc):
+  def from_event(self, eventFromObjectFunc):
     """
     uses the func to fetch an event from our object
     which will be fired by this output's event
     """
     applyFunc = lambda port, obj: eventFromObjectFunc(obj).subscribe(port.event)
+    self.apply(applyFunc)
+
+  def signal_from_event(self, eventFromObjectFunc):
+    """
+    uses the func to fetch an event from our object
+    which will be fired by this output's event
+    """
+    def applyFunc(port,obj):
+      event = eventFromObjectFunc(obj)
+      event += lambda *args, **kwargs: port.event.fire()
+
     self.apply(applyFunc)

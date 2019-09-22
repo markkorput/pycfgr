@@ -27,7 +27,7 @@ class App:
   @staticmethod
   def cfgr(builder):
     # inputs
-    builder.addInput('stop').connect_to_method(lambda obj: obj.onStop)
+    builder.addInput('stop').signal_to_method(lambda obj: obj.onStop)
     builder.addInput('sleep').float_to_method(lambda obj: obj.setSleep)
     # outputs
-    builder.addOutput('started').connect_to_event(lambda obj: obj.startedEvent)
+    builder.addOutput('started').from_event(lambda obj: obj.startedEvent)

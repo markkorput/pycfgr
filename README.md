@@ -74,11 +74,10 @@ class String:
   def cfgr(builder):
     ## outputs
     builder.addInput('value').string(lambda val,obj: obj.setValue(val))
-    builder.addInput('emit').connect_to_method(lambda obj: obj.emit)
+    builder.addInput('emit').signal_to_method(lambda obj: obj.emit)
 
     ## outputs
-    # builder.addOutput('emit').connect(lambda port, obj: obj.emitEvent.subscribe(port.event.fire()))
-    builder.addOutput('emit').connect_to_event(lambda obj: obj.emitEvent)
+    builder.addOutput('emit').from_event(lambda obj: obj.emitEvent)
 ```
 
 _components/print.py (component logic)_

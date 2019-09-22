@@ -18,9 +18,8 @@ class String:
   @staticmethod
   def cfgr(builder):
     # inputs
-    builder.addInput('value').string(lambda val,obj: obj.setValue(val))
-    builder.addInput('emit').connect_to_method(lambda obj: obj.emit)
+    builder.addInput('value').string_to_method(lambda obj: obj.setValue)
+    builder.addInput('emit').signal_to_method(lambda obj: obj.emit)
 
     # outputs
-    # builder.addOutput('emit').connect(lambda port, obj: obj.emitEvent.subscribe(port.event.fire()))
-    builder.addOutput('emit').connect_to_event(lambda obj: obj.emitEvent)
+    builder.addOutput('emit').from_event(lambda obj: obj.emitEvent)

@@ -1,12 +1,6 @@
 from evento import Event
 
 
-
-def is_event_data(data):
-  return str(data).strip().startswith('#')
-
-
-
 class Context:
   def __init__(self, runtime, verbose=False):
     self.runtime = runtime
@@ -18,7 +12,12 @@ class Context:
     Returns a list of pyevento.Event instances for the string-based eventsdata.
     Example of valid eventsdata: "#event1, #event2,#event3" (returns three event instances)
     """
-    return list(map(lambda id: self.runtime.get_event(id.strip()), eventsdata.strip().split(',')))
+    # print(eventsdata)
+    def iter(v):
+      return self.runtime.get_event(v.strip())
+
+    return list(map(iter, eventsdata.strip().split(',')))  
+    # return list(map(lambda id: self.runtime.get_event(id.strip()), eventsdata.strip().split(',')))
 
   def create_instance(self, id, data=None):
     self.verbose('Context.create_instance: {}'.format(id))
@@ -54,37 +53,21 @@ class Context:
       attr_data = data[v]
 
       if input:
-        self.apply_input(input, attr_data)
-      elif output:
-        self.apply_output(output, attr_data)
-      elif v == 'inputs':
-        self.apply_inputs(instance, attr_data)
+        input.event.fire(attr_data)
+        continue
+
+      if output:
+        events = self.get_events(attr_data)
+
+        for e in events:
+          output.event.subscribe(e.fire)
+        continue
+
+      if v == 'inputs':
+        continue # TODO
+
       elif v == 'outputs':
-        self.apply_outputs(instance, attr_data)
-
-  def apply_inputs(self, instance, input_data):
-    pass
-
-  def apply_outputs(self, instance, output_data):
-    pass
-
-  def apply_input(self, port, data):
-    if (str(data).startswith('#')):
-      e = self.runtime.get_event(data)
-      e.subscribe(port.event.fire)
-      return
-
-    port.event.fire(data)
-
-  def apply_output(self, port, data):
-    if not is_event_data(data):
-      print('Unsupported output data, events should be prefixed with a hash symbol (#) and can be comma-separarted')
-      return
-
-    events = self.get_events(data)
-
-    for e in events:
-      port.event.subscribe(e.fire)
+        continue # TODO
 
   def verbose(self, msg):
     if self.isVerbose:
