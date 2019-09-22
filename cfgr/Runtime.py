@@ -10,11 +10,12 @@ def _portDefsFromClass(typeClass):
   """
   if not hasattr(typeClass, 'cfgr'):
     return None
-   # default builder func: a static cfgr method
-  cfgrFunc = typeClass.cfgr
+
+  builderFunc = lambda builder: typeClass.cfgr(builder)
 
   builder = TypeBuilder()
-  cfgrFunc(builder)
+  # default builder func: a static cfgr method
+  builderFunc(builder)
   return builder.getPortDefs()
 
 
