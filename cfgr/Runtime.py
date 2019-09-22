@@ -37,7 +37,7 @@ class Runtime:
     portDefs = _portDefsFromClass(typeClass)
 
     if not portDefs:
-      print("no build func for type: {}".format(typeId))
+      # print("no build func for type: {}".format(typeId))
       portDefs = []
 
     createFunc = typeClass
@@ -71,3 +71,6 @@ class Runtime:
 
   def getObject(self, id):
     return self.idInstances[id].object if id in self.idInstances else None
+
+  def update(self):
+    pass

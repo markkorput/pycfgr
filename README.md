@@ -44,8 +44,9 @@ Below is an example of what an Hello World implementation could look like. Obvio
 _cfgr.json (config)_
 ```json
 {
-  "app.String": {"value": "Hello World!", "in-emit":"#start", "out-emit":"#hello"},
-  "app.Print": {"on": "#hello"}
+  "App": {"started":"#appstarted", "stop":"#stopapp"},
+  "App.String": {"value": "Hello World!", "in-emit":"#appstarted", "out-emit":"#sayhello,#stopapp"},
+  "App.Print": {"on": "#sayhello"}
 }
 ```
 
@@ -97,38 +98,6 @@ class Print:
     builder.addInput('on').string_to_method(lambda val,obj: obj.print)
 ```
 
-
-_app.py (integration logic; a default with similar behaviour is provided by cfgr.app)_
-```python
-import sys
-from cfgr import Runtime, Json
-
-from .components.string import String
-from .components.print import Print
-
-class App:
-  def __init__(self, data_path, componentId, startEvent=None)
-    self.runtime = Runtime()
-    self.runtime.add_type(typeClass=String)
-    self.runtime.add_type(typeClass=Print)
-
-    self.loader = Json.Loader(runtime=self.runtime, json_file=data_path)
-    self.componentId = componentId
-    self.startEvent = startEvent
-
-  def run(self):
-    self.instance = self.loader.create(self.componentId)
-    if self.startEvent:
-      self.loader.runtime.getEvent(self.startEvent).fire()
-
-    while not self.runtime.isDone:
-      self.runtime.update()
-
-if __name__ == '__main__':
-  app = App(sys.argv[0], sys.argv[1], sys.argv[2])
-  app.run()
-```
-
 ```bash
-python app.py cfgr.json app \#start
+python -m cfgr.app cfgr.json # uses the default cfgr.app runner
 ```

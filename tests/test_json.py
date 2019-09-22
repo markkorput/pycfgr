@@ -1,6 +1,5 @@
 from unittest import TestCase
 from evento import Event
-import json
 
 from cfgr import Runtime, Type, Instance, Json
 
@@ -44,14 +43,10 @@ class TestJson(TestCase):
       "Product_3": {"name": "Product3", "reset": "#reset3", "parent": "Product_1" }\
     }'
 
-    data = json.loads(json_text)
-
-    
-
     # create runtime
     runtime = Runtime()
     # create Product type
-    typ = runtime.add_type(typeClass=Product)
+    typ = runtime.add_type(typeClass=Product, json=json_text)
     
     loader = Json.Loader(runtime=runtime, data=data)
 

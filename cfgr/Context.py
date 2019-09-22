@@ -8,8 +8,9 @@ def is_event_data(data):
 
 
 class Context:
-  def __init__(self, runtime):
+  def __init__(self, runtime, verbose=False):
     self.runtime = runtime
+    self.isVerbose = verbose
 
   def get_events(self, eventsdata):
     """
@@ -19,8 +20,14 @@ class Context:
     return list(map(lambda id: self.runtime.get_event(id.strip()), eventsdata.strip().split(',')))
 
   def create_instance(self, id, data=None):
+    self.verbose('Context.create_instance: {}'.format(id))
+
     typ = data['type'] if data and 'type' in data else self._defaultTypeFor(id)
     inst = self.runtime.create_instance(typ, id)
+
+    if not inst:
+      print('[Context] could not instantiate type: {}'.format(typ))
+      return None
 
     if data:
       self.cfg(inst, data)
@@ -38,6 +45,10 @@ class Context:
       if input and output:
         print('ambiguous attribute name: {}, references both an input and an output port'.format(v))
         continue
+      elif v.startswith('in-') and not input:
+        input = instance.input(v.replace('in-',''))
+      elif v.startswith('out-') and not output:
+        output = instance.output(v.replace('out-',''))
 
       attr_data = data[v]
 
@@ -49,8 +60,6 @@ class Context:
         self.apply_inputs(instance, attr_data)
       elif v == 'outputs':
         self.apply_outputs(instance, attr_data)
-      # elif v.startswith('in-')
-      # elif v.startswith('out-')
 
   def apply_inputs(self, instance, input_data):
     pass
@@ -75,3 +84,7 @@ class Context:
 
     for e in events:
       port.event.subscribe(e.fire)
+
+  def verbose(self, msg):
+    if self.isVerbose:
+      print(msg)

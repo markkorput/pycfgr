@@ -1,11 +1,49 @@
+import json as jsonlib
+import re
 from .Context import Context
 
 class Loader:
-  def __init__(self, runtime, data={}):
-    self.context = Context(runtime)
+  def __init__(self, runtime, data=None, json=None, file=None, verbose=False):
+    self.context = Context(runtime, verbose=verbose)
     self.data = data
 
-  def create(self, id):
-    instance_data = self.data[id] if id in self.data else None
-    instance = self.context.create_instance(id, data=instance_data)
+    if not self.data:
+      if file:
+        if verbose: print('Loading json file: {}'.format(file))
+        with open(file, "r") as f:
+          json = f.read()
+
+      if json:
+        self.data = jsonlib.loads(json) 
+
+  def create(self, id, recursive=True):
+    instance_data = self.data[id] if id in self.data else {}
+    instance = self.context.create_instance(self.idToType(id), data=instance_data)
+
+    if recursive:
+      childids = self.findChildIdsFor(id, recursive=True)
+
+      for childid in childids:
+        child_data = self.data[childid] if childid in self.data else None
+        self.context.create_instance(self.idToType(childid), data=child_data)
+
     return instance
+
+  def findChildIdsFor(self, parent, recursive=True):
+    childIds = []
+    for key in self.data:
+      if self.isDirectChild(key, parent):
+        childIds.append(key)
+
+        if recursive:
+          childIds += self.findChildIdsFor(key, recursive=True)
+
+    return childIds
+
+  def isDirectChild(self, key, parentKey):
+    regex = re.compile("^{}\.\w+".format(parentKey))
+
+    return regex.fullmatch(key) != None
+
+  def idToType(self, id):
+    return id.split('.')[-1]
