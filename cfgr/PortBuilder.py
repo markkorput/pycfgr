@@ -29,12 +29,37 @@ class InputBuilder(PortBuilder):
   def __init__(self, id):
     PortBuilder.__init__(self, id, Port.INPUT)
 
-  def string(self, stringFunc):
-    applyFunc = lambda port, obj: port.event.subscribe(lambda v: stringFunc(v, obj))
+  def string(self, valueObjectFunc):
+    applyFunc = lambda port,obj: port.tools.converter(port.event).onString(lambda val: valueObjectFunc(val, obj))
+    self.apply(applyFunc)
+
+  def int(self, valueObjectFunc):
+    applyFunc = lambda port,obj: port.tools.converter(port.event).onInt(lambda val: valueObjectFunc(val, obj))
+    self.apply(applyFunc)
+
+  def bool(self, valueObjectFunc):
+    applyFunc = lambda port,obj: port.tools.converter(port.event).onBool(lambda val: valueObjectFunc(val, obj))
+    self.apply(applyFunc)
+
+  def float(self, valueObjectFunc):
+    applyFunc = lambda port,obj: port.tools.converter(port.event).onFloat(lambda val: valueObjectFunc(val, obj))
+    self.apply(applyFunc)
+
+
+  def bool_to_method(self, objMethodFunc):
+    applyFunc = lambda port, obj: port.tools.converter(port.event).onBool(objMethodFunc(obj))
+    self.apply(applyFunc)
+
+  def int_to_method(self, objMethodFunc):
+    applyFunc = lambda port, obj: port.tools.converter(port.event).onInt(objMethodFunc(obj))
+    self.apply(applyFunc)
+
+  def string_to_method(self, objMethodFunc):
+    applyFunc = lambda port, obj: port.tools.converter(port.event).onString(objMethodFunc(obj))
     self.apply(applyFunc)
 
   def float_to_method(self, objMethodFunc):
-    applyFunc = lambda port, obj: port.event.subscribe(objMethodFunc(obj))
+    applyFunc = lambda port, obj: port.tools.converter(port.event).onFloat(objMethodFunc(obj))
     self.apply(applyFunc)
 
   def connect(self, objMethodFunc):

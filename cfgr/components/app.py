@@ -8,15 +8,18 @@ class App:
   def __init__(self):
     self.startedEvent = Event()
     self.stopEvent = Event()
-    self.sleeptime = 1.0
+    self.sleeptime = 0.001
 
   def start(self):
     self.startedEvent.fire()
 
   def update(self):
+    # print('update')
     time.sleep(self.sleeptime)
 
-  def setSleep(self, val): self.sleeptime = val
+  def setSleep(self, val):
+    # print('setsleep: {}'.format(val))
+    self.sleeptime = val
 
   def onStop(self, *args, **kwargs):
     self.stopEvent()

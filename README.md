@@ -25,15 +25,15 @@ _three famous examples of VPLs (from left to right); [Cyling '74's Max](https://
 
 Why?
 * A text-based workflow using standard formats (like JSON) allows for the most flexible/customizable development pipelines and benefit of massive set of available tools (version control systems, text-editors, IDEs, command-line, ssh, etc.).
-* Separating configuration from the logic provides possiblity to make and actuate changes (from minor properties to major application structures) at runtime.
-* Removing configuraion (as much as possible) from you application code keeps the code clear and concise.
+* Separating configuration from the logic provides possiblity to make and actuate changes at runtime (from minor properties to major application structures).
+* Removing configuration (as much as possible) from your application code keeps the code clear and concise.
 * Enforcing a modular component structure encourages best practices like the single responsibility principle and writing modular code that is truly reusable.
 
 ### Some history
 
 Motivation for this exploration came from many years of experience in professional software development, specifically non web-based UI software development in C++ and Java using frameworks like OpenFrameworks, Cinder and Processing and noticing patterns of repetition, both in code and in general workflow. This experience lead to, initially, the [JavaLibUiBuilder](https://github.com/fusefactory/JavaLibUiBuilder) which builds on top of a UI framework ([JavaLibUi](https://github.com/fusefactory/JavaLibUi), inspired by the [ofxInterface](https://github.com/galsasson/ofxInterface) library for OpenFrameworks/C++), which started the concept of building and configuring application logic from json config files (which feels a bit like writing CSS from a web-page).
 
-This concept was translated into C++ using in the [ciCMS](https://github.com/markkorput/cicms) package for the [Cinder](https://libcinder.org/) framework and extended to provide "native" events and states to further reduce the amount of custom application code needs to be written to make the different components communicate.
+This concept was translated into C++ using in the [ciCMS](https://github.com/markkorput/cicms) package for the [Cinder](https://libcinder.org/) framework and extended to provide "native" events and states to further reduce the amount of custom application code that needs to be written to make the different components communicate.
 
 ## Examples
 

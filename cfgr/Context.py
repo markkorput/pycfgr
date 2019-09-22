@@ -3,13 +3,14 @@ from evento import Event
 
 
 def is_event_data(data):
-  return data.strip().startswith('#')
+  return str(data).strip().startswith('#')
 
 
 
 class Context:
   def __init__(self, runtime, verbose=False):
     self.runtime = runtime
+    self.runtime.port_tools.eventsFunc = self.get_events
     self.isVerbose = verbose
 
   def get_events(self, eventsdata):
@@ -68,7 +69,7 @@ class Context:
     pass
 
   def apply_input(self, port, data):
-    if (data.startswith('#')):
+    if (str(data).startswith('#')):
       e = self.runtime.get_event(data)
       e.subscribe(port.event.fire)
       return
