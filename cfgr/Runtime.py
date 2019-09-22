@@ -29,6 +29,7 @@ class Runtime:
 
     # PortTools is a collection of interfaces that ports can use to fetch specific types of data
     self.port_tools = PortTools(objectFunc=lambda val: self.getObject(val))
+    self.isDone = False
 
   def add_type(self, typeId=None, typeClass=None):
     if not typeId:
@@ -71,3 +72,6 @@ class Runtime:
 
   def getObject(self, id):
     return self.idInstances[id].object if id in self.idInstances else None
+
+  def update(self):
+    pass

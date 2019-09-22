@@ -33,12 +33,15 @@ class InputBuilder(PortBuilder):
     applyFunc = lambda port, obj: port.event.subscribe(lambda v: stringFunc(v, obj))
     self.apply(applyFunc)
 
-  def connect(self, connectFunc):
+  def connect(self, objMethodFunc):
+    self.connect_to_method(objMethodFunc)
+
+  def connect_to_method(self, objMethodFunc):
     """
     uses the connectFunc to fetch a method from our object
     which will be fires when the port's event is fired
     """
-    applyFunc = lambda port, obj: port.event.subscribe(connectFunc(obj))
+    applyFunc = lambda port, obj: port.event.subscribe(objMethodFunc(obj))
     self.apply(applyFunc)
   
   def object(self, valueObjectFunc):
@@ -48,14 +51,21 @@ class InputBuilder(PortBuilder):
 
     self.apply(applyfunc)
 
+  def string_to_method(self, objMethodFunc):
+    # TODO; perform string payload validation
+    self.connect_to_method(objMethodFunc)
+
 class OutputBuilder(PortBuilder):
   def __init__(self, id):
     PortBuilder.__init__(self, id, Port.OUTPUT)
 
   def connect(self, eventFromObjectFunc):
+    self.connect_to_event(eventFromObjectFunc)
+
+  def connect_to_event(self, eventFromObjectFunc):
     """
     uses the func to fetch an event from our object
-    which will be forwarded by this output's event
+    which will be fired by this output's event
     """
     applyFunc = lambda port, obj: eventFromObjectFunc(obj).subscribe(port.event)
     self.apply(applyFunc)

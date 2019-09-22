@@ -112,7 +112,7 @@ class App:
     self.runtime.add_type(typeClass=String)
     self.runtime.add_type(typeClass=Print)
 
-    self.loader = Json.Loader(runtime=self.runtime, json_file=data_path)
+    self.loader = Json.Loader(runtime=self.runtime, file=data_path)
     self.componentId = componentId
     self.startEvent = startEvent
 
@@ -125,7 +125,7 @@ class App:
       self.runtime.update()
 
 if __name__ == '__main__':
-  app = App(sys.argv[0], sys.argv[1], sys.argv[2])
+  app = App(sys.argv[1], sys.argv[2], sys.argv[3])
   app.run()
 ```
 
