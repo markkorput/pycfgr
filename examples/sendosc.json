@@ -1,0 +1,6 @@
+{
+  "App": {"started":"#sendtest,#sendplay,#stop", "stop":"#stop"},
+  "App.OscOut": {"host": "127.0.0.1", "port": 3002, "in-send": "#sendmsg", "verbose":true},
+  "App.OscMessage_1": {"address": "/test", "params": ["test", 1, 2, 3], "in-send": "#sendtest", "out-send": "#sendmsg"},
+  "App.OscMessage_2": {"address": "/play", "params": ["test", 1, 2, 3], "in-send": "#sendplay", "out-send": "#sendmsg"}
+}

@@ -81,6 +81,13 @@ class InputBuilder(PortBuilder):
 
     self.apply(applyfunc)
 
+  def to_method(self, objMethodFunc):
+    def applyfunc(port, obj):
+      method = objMethodFunc(obj)
+      # valfunc = lambda val: method(port.tools.getObject(val))
+      port.event.subscribe(method)
+
+    self.apply(applyfunc)
 
 class OutputBuilder(PortBuilder):
   def __init__(self, id):
