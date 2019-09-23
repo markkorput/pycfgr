@@ -18,6 +18,20 @@ class Converter:
   def onBool(self, callback):
     self.convertBeforeCallback(callback, lambda v: bool(v))
 
+  def onList(self, callback):
+    self.convertBeforeCallback(callback, lambda v: list(v))
+
+  def onValue(self, callback):
+    def valuefunc(val):
+      if not self.isEventData(val):
+        callback(val)
+        return
+
+      for e in self.tools.getEvents(val):
+        e.subscribe += callback
+      
+    self.singleValueCallback(valuefunc)
+
   def convertBeforeCallback(self, callback, converter):
     self.singleValueCallback(lambda v: callback(converter(v)))
 
@@ -47,6 +61,7 @@ class Converter:
         callback(val)
 
     self.event += valueHandler
+
 
   def isEventData(self, data):
     return str(data).strip().startswith('#')

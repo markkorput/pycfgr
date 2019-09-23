@@ -68,7 +68,7 @@ class String:
     self.value = v
 
   def emit(self):
-    self.emitEvent(self.value)
+    self.emitEvent(self.value)previ
 
   @staticmethod
   def cfgr(builder):
@@ -99,4 +99,16 @@ class Print:
 
 ```bash
 python -m cfgr.app cfgr.json # uses the default cfgr.app runner
+```
+
+### Osc Sender
+
+_cfgr.json_
+```json
+{
+  "App": {"started":"#sendtest,#sendplay,#stop", "stop":"#stop"},
+  "App.OscOut": {"host": "127.0.0.1", "port": 3002, "in-send": "#sendmsg"},
+  "App.OscMessage": {"address": "/test", "params": ["test", 1, 2, 3], "in-send": "#sendtest", "out-send": "#sendmsg"},
+  "App.OscMessage": {"address": "/play", "params": ["test", 1, 2, 3], "in-send": "#sendplay", "out-send": "#sendmsg"}
+}
 ```
