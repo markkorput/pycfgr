@@ -95,7 +95,7 @@ class OscIn:
     # skip touch osc touch-up events
     # if len(data) == 1 and data[0] == 0.0:
     #     return
-    self.logger.warning('osc-in {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
+    self.logger.info('osc-in {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
     self.messageEvent((addr, args))
     # # trigger events based on incoming messages if configured
     # if addr in self.msgEventMapping:
@@ -110,6 +110,6 @@ class OscIn:
     #     print('triggering argEvent:', addr)
     #     self.event_manager.get(self.argEvents[addr]).fire(args)
 
-  def setVerbose(self, v): self.isVerbose = v
+  def setVerbose(self, v): self.logger.setLevel(logging.DEBUG if v else logging.WARNING)
   def setHost(self, host): self.host = host
   def setPort(self, port): self.port = port
