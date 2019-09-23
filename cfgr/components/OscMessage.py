@@ -16,7 +16,9 @@ class OscMessage:
   def setVerbose(self, v): self.isVerbose = v
   def setAddress(self, addr): self.addr = addr
   def setData(self, data): self.data = data
-  def send(self): self.sendEvent((self.addr, self.data))
+  def send(self):
+    self.verbose('OscMessage sending: {} {}'.format(self.addr, self.data))
+    self.sendEvent((self.addr, self.data))
 
   @staticmethod
   def cfgr(builder):

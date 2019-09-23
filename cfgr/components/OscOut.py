@@ -39,6 +39,8 @@ class OscOut:
 
   def connect(self):
     host = self.host
+    port = self.port
+
     if not host:
       print("no host, can't connect")
       return False
@@ -81,7 +83,6 @@ class OscOut:
         print("OscOut failed to connect")
         return
 
-    print('sendMessage: ',message)
     addr, data = message
     try:
       self.client.send_message(addr, data)
@@ -94,5 +95,3 @@ class OscOut:
       print('[osc-out {0}:{1}] error:'.format(self.host(), self.port()))
       print(str(err))
       # self.stop()
-
-    print('sendMessage done')
