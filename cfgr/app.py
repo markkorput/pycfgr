@@ -6,6 +6,7 @@ from .components.app import App
 from .components.string import String
 from .components.print import Print
 from .components.OscOut import OscOut
+from .components.OscIn import OscIn
 from .components.OscMessage import OscMessage
 
 class Runner:
@@ -18,6 +19,7 @@ class Runner:
     self.runtime.add_type(typeClass=String)
     self.runtime.add_type(typeClass=Print)
     self.runtime.add_type(typeClass=OscOut)
+    self.runtime.add_type(typeClass=OscIn)
     self.runtime.add_type(typeClass=OscMessage)
 
     self.componentId = component_id

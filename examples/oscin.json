@@ -1,0 +1,4 @@
+{
+  "App": {"started":"#startlistening", "stop":"#stop"},
+  "App.OscIn": {"port": 3002, "connect":"#startlistening", "message":"#stop", "verbose":true}
+}

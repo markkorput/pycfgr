@@ -8,6 +8,7 @@ except ImportError:
     udp_client = None
 
 class OscOut:
+
   @staticmethod
   def cfgr(builder):
     ## outputs
