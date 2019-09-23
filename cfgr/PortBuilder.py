@@ -66,6 +66,10 @@ class InputBuilder(PortBuilder):
     applyFunc = lambda port, obj: port.tools.converter(port.event).onFired(objMethodFunc(obj))
     self.apply(applyFunc)
 
+  def list_to_method(self, objMethodFunc):
+    applyFunc = lambda port, obj: port.tools.converter(port.event).onList(objMethodFunc(obj))
+    self.apply(applyFunc)
+
   def object(self, valueObjectFunc):
     def applyfunc(port, obj):
       valfunc = lambda val: valueObjectFunc(port.tools.getObject(val), obj)
@@ -82,11 +86,7 @@ class InputBuilder(PortBuilder):
     self.apply(applyfunc)
 
   def to_method(self, objMethodFunc):
-    def applyfunc(port, obj):
-      method = objMethodFunc(obj)
-      # valfunc = lambda val: method(port.tools.getObject(val))
-      port.event.subscribe(method)
-
+    applyfunc = lambda port, obj: port.tools.converter(port.event).onValue(objMethodFunc(obj))
     self.apply(applyfunc)
 
 class OutputBuilder(PortBuilder):
