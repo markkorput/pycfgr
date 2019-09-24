@@ -9,6 +9,7 @@ from .components.OscOut import OscOut
 from .components.OscIn import OscIn
 from .components.OscMessage import OscMessage
 from .components.Runner import Runner
+from .components.Event import Event
 
 class Exe:
   DEFAULT_DATA_PATH = 'cfgr.json'
@@ -23,6 +24,7 @@ class Exe:
     self.runtime.add_type(typeClass=OscIn)
     self.runtime.add_type(typeClass=OscMessage)
     self.runtime.add_type(typeClass=Runner)
+    self.runtime.add_type(typeClass=Event)
 
     self.componentId = component_id
     self.verbose = verbose

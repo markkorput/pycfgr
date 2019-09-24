@@ -18,8 +18,11 @@ class OscIn:
     builder.addInput('host').string_to_method(lambda obj: obj.setHost)
     builder.addInput('port').int_to_method(lambda obj: obj.setPort)
     builder.addInput('connect').signal_to_method(lambda obj: obj.connect)
+    
     builder.addInput('disconnect').signal_to_method(lambda obj: obj.disconnect)
     builder.addOutput('message').from_event(lambda obj: obj.messageEvent)
+    builder.addOutput('connected').from_event(lambda obj: obj.connectedEvent)
+    builder.addOutput('disconnected').from_event(lambda obj: obj.disconnectedEvent)
 
   def __init__(self):
     self.osc_server = None
@@ -31,8 +34,8 @@ class OscIn:
     self.port = 0
     self.isVerbose = False
 
-    self.connectEvent = Event()
-    self.disconnectEvent = Event()
+    self.connectedEvent = Event()
+    self.disconnectedEvent = Event()
     self.messageEvent = Event()
 
   def __del__(self):
@@ -46,7 +49,7 @@ class OscIn:
       return False
 
     if osc_server == None:
-      print('No pythonosc')
+      print('[OscIn] pythonosc not available')
       return False
 
     disp = dispatcher.Dispatcher()
@@ -71,12 +74,12 @@ class OscIn:
       # set internal connected flag
       result = True
     except OSError as err:
-      print("Could not start OSC server: "+str(err))
+      print("[OscIn] Could not start OSC server: "+str(err))
 
     if result:
       # notify
-      self.connectEvent(self)
-      self.verbose("OSC Server running @ {0}:{1}".format(self.host, str(self.port)))
+      self.verbose("[OscIn] server running @ {0}:{1}".format(self.host, str(self.port)))
+      self.connectedEvent(self)
 
     self.isConnected = result
     return result
@@ -88,14 +91,14 @@ class OscIn:
         self.osc_server.shutdown()
         self.osc_server = None
       self.isConnected = False
-      self.disconnectEvent(self)
-      self.verbose('OSC Server ({0}:{1}) stopped'.format(self.host, str(self.port)))
+      self.disconnectedEvent(self)
+      self.verbose('[OscIn] server stopped @ {0}:{1}'.format(self.host, str(self.port)))
 
   def _onOscMsg(self, addr, *args):
     # skip touch osc touch-up events
     # if len(data) == 1 and data[0] == 0.0:
     #     return
-    self.verbose('osc-in {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
+    self.verbose('[OscIn] received {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
     self.messageEvent((addr, args))
     # # trigger events based on incoming messages if configured
     # if addr in self.msgEventMapping:

@@ -1,6 +1,8 @@
 {
-  "App": {"started":"#loadin,#loadout,#sendtest", "stop":"#stop"},
+  "App": {"started":"#load,#startlistening", "stop":"#stop"},
 
-  "App.Runner_oscin": {"runtime":"$runtime", "url":"examples/oscin.json", "component":"App.OscIn", "create":"#loadin", "events-out": {"#oscmessage": "#oscmessagein"}, "verbose":true},
-  "App.Runner_oscout": {"runtime":"$runtime", "url":"examples/oscout.json", "component":"App.OscOut", "create":"#loadout", "events-in": {"#sendtest": "#sendtest"}, "verbose":true}
+  "App.Event": {"on":"#osclistenerconnected", "do":"#sendtest,#stop"},
+
+  "App.Runner_oscin": {"runtime":"$runtime", "url":"examples/oscin.json", "component":"App.OscIn", "load":"#load", "verbose":false, "input": ["#startlistening"], "output": ["#oscmessage", "#osclistenerconnected"]},
+  "App.Runner_oscout": {"runtime":"$runtime", "url":"examples/oscout.json", "component":"App.OscOut", "load":"#load", "verbose":false, "input":["#sendtest"]}
 }

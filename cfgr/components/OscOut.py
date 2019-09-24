@@ -43,7 +43,7 @@ class OscOut:
     port = self.port
 
     if not host:
-      print("no host, can't connect")
+      print("[OscOut] no host, can't connect")
       return False
 
     # try:
@@ -56,13 +56,13 @@ class OscOut:
     #     return False
 
     if udp_client == None:
-      print("OscOutput missing OSC dependency")
+      print("[OscOut]  missing OSC dependency")
       return False
 
     self.client = udp_client.SimpleUDPClient(host, port)
     self.connected = True
     self.connectEvent(self)
-    self.verbose("connected to {}:{}".format(host, self.port))
+    self.verbose("[OscOut] connected to {}:{}".format(host, self.port))
     return True
 
   def disconnect(self):
@@ -72,7 +72,7 @@ class OscOut:
     # self.client.close()
     self.client = None
     self.disconnectEvent(self)
-    self.verbose("OSC client ({0}:{1}) closed".format(self.host, self.port))
+    self.verbose("[OscOut] disconnect from {0}:{1}".format(self.host, self.port))
 
   def verbose(self, msg):
     if self.isVerbose:
@@ -81,18 +81,16 @@ class OscOut:
   def sendMessage(self, message):
     if not self.isConnected():
       if not self.connect():
-        print("OscOut failed to connect")
+        print("[OscOut] failed to connect")
         return
 
     addr, data = message
     try:
       self.client.send_message(addr, data)
       self.messageEvent(message, self)
-      self.verbose('osc-out {0}:{1} - {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
+      self.verbose('[OscOut] sent {0}:{1} - {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
     #     # self.client.send(msg)s
     # except OSC.OSCClientError as err:
     #     pass
     except AttributeError as err:
-      print('[osc-out {0}:{1}] error:'.format(self.host(), self.port()))
-      print(str(err))
-      # self.stop()
+      print('[OscOut] error for client {0}:{1}:'.format(self.host, self.port, str(err)))

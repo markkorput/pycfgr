@@ -1,4 +1,4 @@
-# from evento import Event
+from evento import Event
 import re
 from cfgr.Runtime import Runtime
 from cfgr.Json import Loader
@@ -16,26 +16,27 @@ class Runner:
     builder.addInput('runtime').to_method(lambda obj: obj.setRuntime)
     builder.addInput('url').string_to_method(lambda obj: obj.setUrl)
     builder.addInput('component').string_to_method(lambda obj: obj.setComponent)
-    builder.addInput('scope').string_to_method(lambda obj: obj.setScope)
-    builder.addInput('create').signal_to_method(lambda obj: obj.create)
-    builder.addInput('events').to_method(lambda obj: obj.setInputEvent)
+    builder.addInput('load').signal_to_method(lambda obj: obj.load)
+    builder.addInput('input').to_method(lambda obj: obj.setInputEvents)
+    builder.addInput('output').to_method(lambda obj: obj.setOutputEvents)
+    builder.addOutput('loaded').from_event(lambda obj: obj.loadedEvent)
 
   def __init__(self):
     self.isVerbose = False
     self.data = None
     self.componentId = None
     self.runtime = Runtime()
-    self.scope = None
+    self.parentRuntime = None
     self.filepath = None
     self.url = None
+
+    self.loadedEvent = Event()
 
   def setVerbose(self, v): self.isVerbose = v
 
   def setRuntime(self, runtime):
+    self.parentRuntime = runtime
     self.runtime = Runtime(copyTypesFrom=runtime)
-
-  def setScope(self, scope):
-    self.scope = scope
 
   def setComponent(self, compid):
     self.componentId = compid
@@ -47,32 +48,55 @@ class Runner:
       return
 
     self.filepath = re.compile('file\:\/\/').sub('', url)
-    #if url.startswith('file://'): # DEFAULT 
-    
-    # if filepath:
-    #   with open(filepath, "r") as f:
-    #     self.verbose('[Runner] loading file: {}'.format(data))
-    #     self.setData(f.read())
 
-  # def setData(self, dat):
-  #   self.data = dat
-
-  def create(self):
-    
+  def load(self):
     if not self.runtime:
       print('no runtime')
       return
 
-    loader = Loader(runtime=self.runtime, file=self.filepath, verbose=True)
+    loader = Loader(runtime=self.runtime, file=self.filepath, verbose=self.isVerbose)
     self.verbose('[Runner] creating, root node: {} from schema: {}'.format(self.componentId, self.url))
     inst = loader.create(self.componentId, recursive=True)
+    self.loadedEvent()
 
-  def setInputEvent(self, event_data):
+  def setInputEvents(self, event_data):
+    # turn list into dict
+    if type(event_data) == type([]):
+      tmp = {}
+      for val in event_data:
+        tmp[val] = val
+      event_data = tmp
+
     if type(event_data) == type({}):
-      # for key in event_data:
-        # for e in self.runtime.getEvents(key):
-          # e.subscribe(lambda *args,**kwargs: 
-          # pass)
+      for key in event_data:
+        value = event_data[key]
+        source_event = self.parentRuntime.get_event(key)
+        dest_event = self.runtime.get_event(value)
+        source_event += dest_event.fire
+
+        if self.verbose:
+          source_event += lambda *args, **kwargs: self.verbose("[Runner] input event: {} -> {}".format(key,value))
+      return
+
+    print('Unsupported input events data')
+
+  def setOutputEvents(self, event_data):
+    # turn list into dict
+    if type(event_data) == type([]):
+      tmp = {}
+      for val in event_data:
+        tmp[val] = val
+      event_data = tmp
+
+    if type(event_data) == type({}):
+      for key in event_data:
+        value = event_data[key]
+
+        source_event = self.runtime.get_event(key)
+        dest_event = self.parentRuntime.get_event(value)
+        source_event += dest_event.fire
+        if self.verbose:
+          source_event += lambda *args, **kwargs: self.verbose("[Runner] ouput event: {} -> {}".format(key,value))
       return
 
     print('Unsupported input events data')
