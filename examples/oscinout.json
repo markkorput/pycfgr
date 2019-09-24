@@ -1,0 +1,6 @@
+{
+  "App": {"started":"#loadin,#loadout,#sendtest", "stop":"#stop"},
+
+  "App.Load": {"data":"oscin.json", "create":"App.OscIn", "events-out": {"#oscmessage": "#oscmessagein"},
+  "App.Load": {"data":"oscout.json", "create":"App.OscOut", "events-in": {"#sendtest": "#sendtest"}
+}

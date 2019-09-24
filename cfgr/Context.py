@@ -1,5 +1,5 @@
 from evento import Event
-
+import re
 
 class Context:
   def __init__(self, runtime, verbose=False):
@@ -46,9 +46,13 @@ class Context:
         print('ambiguous attribute name: {}, references both an input and an output port'.format(v))
         continue
       elif v.startswith('in-') and not input:
-        input = instance.input(v.replace('in-',''))
+        input = re.compile('^in-').sub('', input)
+      elif v.endswith('-in') and not input:
+        input = re.compile('-in$').sub('', input)
       elif v.startswith('out-') and not output:
-        output = instance.output(v.replace('out-',''))
+        output = re.compile('^out-').sub('', input)
+      elif v.endswith('-out') and not output:
+        output = re.compile('-out$').sub('', output)
 
       attr_data = data[v]
 
