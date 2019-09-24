@@ -1,15 +1,7 @@
 import sys
 from optparse import OptionParser
 from cfgr import Runtime, Json
-
-from .components.app import App
-from .components.string import String
-from .components.print import Print
-from .components.OscOut import OscOut
-from .components.OscIn import OscIn
-from .components.OscMessage import OscMessage
-from .components.Runner import Runner
-from .components.Event import Event
+from .discover import addAllTypes
 
 class Exe:
   DEFAULT_DATA_PATH = 'cfgr.json'
@@ -17,14 +9,8 @@ class Exe:
 
   def __init__(self, data_path=None, component_id=None, start_event=None, verbose=False):
     self.runtime = Runtime()
-    self.runtime.add_type(typeClass=App)
-    self.runtime.add_type(typeClass=String)
-    self.runtime.add_type(typeClass=Print)
-    self.runtime.add_type(typeClass=OscOut)
-    self.runtime.add_type(typeClass=OscIn)
-    self.runtime.add_type(typeClass=OscMessage)
-    self.runtime.add_type(typeClass=Runner)
-    self.runtime.add_type(typeClass=Event)
+    addAllTypes(self.runtime)
+
 
     self.componentId = component_id
     self.verbose = verbose
