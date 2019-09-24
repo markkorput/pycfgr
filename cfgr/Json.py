@@ -45,9 +45,8 @@ class Loader:
     return childIds
 
   def isDirectChild(self, key, parentKey):
-    regex = re.compile("^{}\.\w+".format(parentKey))
-
-    return regex.fullmatch(key) != None
+    pattern = "^{}\.\w+".format(parentKey)
+    return re.match(pattern, key) != None
 
   def idToType(self, id):
     return id.split('.')[-1]
