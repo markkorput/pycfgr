@@ -1,6 +1,6 @@
 {
   "App": {"started":"#loadin,#loadout,#sendtest", "stop":"#stop"},
 
-  "App.Load": {"data":"oscin.json", "create":"App.OscIn", "events-out": {"#oscmessage": "#oscmessagein"},
-  "App.Load": {"data":"oscout.json", "create":"App.OscOut", "events-in": {"#sendtest": "#sendtest"}
+  "App.Runner_oscin": {"runtime":"$runtime", "url":"examples/oscin.json", "component":"App.OscIn", "create":"#loadin", "events-out": {"#oscmessage": "#oscmessagein"}, "verbose":true},
+  "App.Runner_oscout": {"runtime":"$runtime", "url":"examples/oscout.json", "component":"App.OscOut", "create":"#loadout", "events-in": {"#sendtest": "#sendtest"}, "verbose":true}
 }

@@ -41,7 +41,6 @@ class Loader:
 
         if recursive:
           childIds += self.findChildIdsFor(key, recursive=True)
-
     return childIds
 
   def isDirectChild(self, key, parentKey):

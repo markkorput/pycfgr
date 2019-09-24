@@ -42,19 +42,22 @@ class Context:
       input = instance.input(v)
       output = instance.output(v)
 
+
+
       if input and output:
         print('ambiguous attribute name: {}, references both an input and an output port'.format(v))
         continue
-      elif v.startswith('in-') and not input:
-        input = re.compile('^in-').sub('', input)
-      elif v.endswith('-in') and not input:
-        input = re.compile('-in$').sub('', input)
-      elif v.startswith('out-') and not output:
-        output = re.compile('^out-').sub('', input)
-      elif v.endswith('-out') and not output:
-        output = re.compile('-out$').sub('', output)
 
       attr_data = data[v]
+
+      if v.startswith('in-') and not input:
+        input = instance.input(re.compile('^in-').sub('', v))
+      elif v.endswith('-in') and not input:
+        input = instance.input(re.compile('-in$').sub('', v))
+      elif v.startswith('out-') and not output:
+        output = instance.output(re.compile('^out-').sub('', v))
+      elif v.endswith('-out') and not output:
+        output = instance.output(re.compile('-out$').sub('', v))
 
       if input:
         input.event.fire(attr_data)
