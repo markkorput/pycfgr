@@ -22,7 +22,6 @@ class OscIn:
     builder.addOutput('message').from_event(lambda obj: obj.messageEvent)
 
   def __init__(self):
-    self.logger = logging.getLogger('OscIn')
     self.osc_server = None
     self.isConnected = False
     self.running = False
@@ -30,6 +29,7 @@ class OscIn:
     self.thread = None
     self.host = ''
     self.port = 0
+    self.isVerbose = False
 
     self.connectEvent = Event()
     self.disconnectEvent = Event()
@@ -46,7 +46,7 @@ class OscIn:
       return False
 
     if osc_server == None:
-      self.logger.warning('No pythonosc')
+      print('No pythonosc')
       return False
 
     disp = dispatcher.Dispatcher()
@@ -71,12 +71,12 @@ class OscIn:
       # set internal connected flag
       result = True
     except OSError as err:
-      self.logger.warning("Could not start OSC server: "+str(err))
+      print("Could not start OSC server: "+str(err))
 
     if result:
       # notify
       self.connectEvent(self)
-      self.logger.info("OSC Server running @ {0}:{1}".format(self.host, str(self.port)))
+      self.verbose("OSC Server running @ {0}:{1}".format(self.host, str(self.port)))
 
     self.isConnected = result
     return result
@@ -89,13 +89,13 @@ class OscIn:
         self.osc_server = None
       self.isConnected = False
       self.disconnectEvent(self)
-      self.logger.info('OSC Server ({0}:{1}) stopped'.format(self.host, str(self.port)))
+      self.verbose('OSC Server ({0}:{1}) stopped'.format(self.host, str(self.port)))
 
   def _onOscMsg(self, addr, *args):
     # skip touch osc touch-up events
     # if len(data) == 1 and data[0] == 0.0:
     #     return
-    self.logger.info('osc-in {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
+    self.verbose('osc-in {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
     self.messageEvent((addr, args))
     # # trigger events based on incoming messages if configured
     # if addr in self.msgEventMapping:
@@ -110,6 +110,9 @@ class OscIn:
     #     print('triggering argEvent:', addr)
     #     self.event_manager.get(self.argEvents[addr]).fire(args)
 
-  def setVerbose(self, v): self.logger.setLevel(logging.DEBUG if v else logging.WARNING)
+  def setVerbose(self, v): self.isVerbose = v
   def setHost(self, host): self.host = host
   def setPort(self, port): self.port = port
+  def verbose(self, msg):
+    if self.isVerbose:
+      print(msg)
