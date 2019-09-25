@@ -20,15 +20,15 @@ def _portDefsFromClass(typeClass):
 
 
 class Runtime:
-  def __init__(self):
-    self.types = []
+  def __init__(self, copyTypesFrom=None):
+    self.types = copyTypesFrom.types if copyTypesFrom else []
     self.instances = []
 
     self.idInstances = {}
     self.events = {}
 
     # PortTools is a collection of interfaces that ports can use to fetch specific types of data
-    self.port_tools = PortTools(objectFunc=lambda val: self.getObject(val))
+    self.port_tools = PortTools(objectFunc=lambda val: self.getObject(val), runtime=self)
 
   def add_type(self, typeId=None, typeClass=None):
     if not typeId:

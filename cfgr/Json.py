@@ -41,11 +41,10 @@ class Loader:
 
         if recursive:
           childIds += self.findChildIdsFor(key, recursive=True)
-
     return childIds
 
   def isDirectChild(self, key, parentKey):
-    pattern = "^{}\.\w+".format(parentKey)
+    pattern = "^{}\.\w+$".format(parentKey)
     return re.match(pattern, key) != None
 
   def idToType(self, id):

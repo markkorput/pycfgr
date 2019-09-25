@@ -1,36 +1,26 @@
 import sys
 from optparse import OptionParser
 from cfgr import Runtime, Json
+from .discover import addAllTypes
 
-from .components.app import App
-from .components.string import String
-from .components.print import Print
-from .components.OscOut import OscOut
-from .components.OscIn import OscIn
-from .components.OscMessage import OscMessage
-
-class Runner:
+class Exe:
   DEFAULT_DATA_PATH = 'cfgr.json'
   DEFAULT_COMPONENT = 'App'
 
   def __init__(self, data_path=None, component_id=None, start_event=None, verbose=False):
     self.runtime = Runtime()
-    self.runtime.add_type(typeClass=App)
-    self.runtime.add_type(typeClass=String)
-    self.runtime.add_type(typeClass=Print)
-    self.runtime.add_type(typeClass=OscOut)
-    self.runtime.add_type(typeClass=OscIn)
-    self.runtime.add_type(typeClass=OscMessage)
+    addAllTypes(self.runtime)
+
 
     self.componentId = component_id
     self.verbose = verbose
     self.isDone = False
     self.start_event = start_event
-    self.loader = Json.Loader(runtime=self.runtime, file=data_path if data_path else Runner.DEFAULT_DATA_PATH, verbose=self.verbose)
+    self.loader = Json.Loader(runtime=self.runtime, file=data_path if data_path else Exe.DEFAULT_DATA_PATH, verbose=self.verbose)
 
   def run(self):
     isDefaultApp = self.componentId == None
-    inst = self.loader.create(Runner.DEFAULT_COMPONENT if isDefaultApp else self.componentId, recursive=True)
+    inst = self.loader.create(Exe.DEFAULT_COMPONENT if isDefaultApp else self.componentId, recursive=True)
     self.app = inst.object if isDefaultApp else None
 
     if isDefaultApp:
@@ -62,5 +52,5 @@ if __name__ == '__main__':
   parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False)
   opts, args = parser.parse_args()
 
-  runner = Runner(data_path=opts.data, component_id=opts.create, start_event=opts.startevent, verbose=opts.verbose)
-  runner.run()
+  exe = Exe(data_path=opts.data, component_id=opts.create, start_event=opts.startevent, verbose=opts.verbose)
+  exe.run()

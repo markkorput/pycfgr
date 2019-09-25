@@ -23,13 +23,18 @@ class Converter:
 
   def onValue(self, callback):
     def valuefunc(val):
-      if not self.isEventData(val):
-        callback(val)
+      if self.isEventData(val):
+        for e in self.tools.getEvents(val):
+          e.subscribe += callback
         return
 
-      for e in self.tools.getEvents(val):
-        e.subscribe += callback
-      
+      if self.isRuntimeConstant(val):
+        callback(self.tools.getRuntime())
+        return
+
+      callback(val)
+      return
+
     self.singleValueCallback(valuefunc)
 
   def convertBeforeCallback(self, callback, converter):
@@ -66,20 +71,28 @@ class Converter:
   def isEventData(self, data):
     return str(data).strip().startswith('#')
 
+  def isRuntimeConstant(self, val):
+    return val == '$runtime'
+
 class PortTools:
   """
   PortTools is a collection of interfaces through which ports can Ports can fetch
   specific types of data
   """
-  def __init__(self, objectFunc=None, eventsFunc=None):
+  def __init__(self, objectFunc=None, eventsFunc=None, runtimeFunc=None, runtime=None):
     self.objectFunc = objectFunc
     self.eventsFunc = eventsFunc
+    self.runtimeFunc = runtimeFunc
+    self.runtime = runtime
 
   def getObject(self, data):
     return self.objectFunc(data) if self.objectFunc else None
 
   def getEvents(self, data):
     return self.eventsFunc(data) if self.eventsFunc else []
+
+  def getRuntime(self):
+    return self.runtime if self.runtime else self.runtimeFunc() if self.runtimeFunc else None
 
   def converter(self, event):
     return Converter(self, event)
