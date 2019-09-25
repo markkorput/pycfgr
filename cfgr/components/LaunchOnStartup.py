@@ -111,7 +111,7 @@ class LaunchOnStartup:
     self.doneEvent = Event()
 
   def setCwd(self, cwd):
-    self.cwd = cwd
+    self.cwd = os.path.abspath(cwd)
 
   def setDataPath(self, p):
     self.dataPath = p
