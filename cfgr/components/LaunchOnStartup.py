@@ -2,7 +2,8 @@ from cfgr.event import Event
 import platform, os.path
 
 class StartupScriptInstaller:
-  def __init__(self, startupScriptPath, script):
+  def __init__(self, startupScriptPath, script, beforeCommand=None):
+    self.beforeCommand = beforeCommand
     self.script = script
     self.startupScriptPath = startupScriptPath
 
@@ -22,8 +23,28 @@ class StartupScriptInstaller:
       print('[LaunchOnStartup] hook already installed')
       return
 
+    # should be insert our script code before a potential existing command?
+    if self.beforeCommand:
+      originalcontent = ''
+      if os.path.isfile(self.startupScriptPath):
+        with open(self.startupScriptPath, "r") as f:
+          originalcontent = f.read()
+    
+      # can we find that specified in command in the existing file content?
+      if self.beforeCommand in originalcontent:
+        idx = originalcontent.find(self.beforeCommand)
+        before_part = originalcontent[:idx]
+        after_part = originalcontent[idx:]
+        newcontent = "{}\n\n{}\n\n{}".format(before_part, self.script, after_part)
+
+        with open(self.startupScriptPath, "w") as f:
+          f.write(newcontent)
+
+        return
+
+    # simply append to end of file
     with open(self.startupScriptPath, "a") as f:
-      content = f.write("\n"+self.script)
+      f.write("\n"+self.script)
 
     print('[LaunchOnStartup] startup hook written to: {}'.format(self.startupScriptPath))
 
@@ -61,11 +82,11 @@ class StartupScriptInstaller:
 
 class LinuxInstaller(StartupScriptInstaller):
   def __init__(self, cwd, data, component, startevent):
-    StartupScriptInstaller.__init__(self, "/etc/rc.local", self.getScript(cwd, data, component, startevent))
+    StartupScriptInstaller.__init__(self, "/etc/rc.local", self.getScript(cwd, data, component, startevent), beforeCommand="exit 0")
 
 class DarwinInstaller(StartupScriptInstaller): # TODO
   def __init__(self, cwd, data, component, startevent):
-    StartupScriptInstaller.__init__(self, "rc.local.test", self.getScript(cwd, data, component, startevent))
+    StartupScriptInstaller.__init__(self, "rc.local.test", self.getScript(cwd, data, component, startevent), beforeCommand="exit 0")
 
 class LaunchOnStartup:
   """
