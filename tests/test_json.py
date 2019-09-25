@@ -40,7 +40,8 @@ class TestJson(TestCase):
     json_text = '{\
       "Product_1": {"name": "Product #1", "reset":"#Reset1" },\
       "Product_2": {"name": "Product no. 2", "afterReset": "#Reset1, #reset3" },\
-      "Product_3": {"name": "Product3", "reset": "#reset3", "parent": "Product_1" }\
+      "Product_3": {"name": "Product3", "reset": "#reset3", "parent": "Product_1" },\
+      "Product_3/Product_4": {"name": "Product4" }\
     }'
 
     # create runtime
@@ -53,32 +54,22 @@ class TestJson(TestCase):
     inst1 = loader.create("Product_1")
     inst2 = loader.create("Product_2")
     inst3 = loader.create("Product_3")
+    inst4 = runtime.instances[3]
 
-    # create Product 1 instance
-    # inst1 = runtime.create_instance('Product')
-
-    # # verify initial state
-    # self.assertEquals(inst1.object.name, '')
-
-    # # configure Product instance using json data
-    # Json.apply(inst1, data['Product1'], runtime=runtime)
     self.assertEquals(inst1.object.name, 'Product #1')
-
-    # create and configure Product2 instance using different json data
-    # inst2 = runtime.create_instance('Product')
-    # Json.apply(inst2, data['Product_2'], runtime=runtime)
     self.assertEquals(inst2.object.name, 'Product no. 2')
-
-    # create and configure Product3
-    # inst3 = runtime.create_instance('Product')
-    # Json.apply(inst3, data['Product_3'], runtime=runtime)
     self.assertEquals(inst3.object.name, 'Product3')
+    self.assertEquals(inst4.object.name, 'Product4')
 
     # verify that inst2 afterReset property fires #ResetAll event, which resets Product1
     self.assertEquals(inst1.object.name, 'Product #1')
     inst2.object.reset()
     self.assertEquals(inst1.object.name, '')
     self.assertEquals(inst3.object.name, '')
+    self.assertEquals(inst4.object.name, 'Product4')
 
     # verify product3's parent is product1
     self.assertEquals(inst3.object.parent, inst1.object)
+    self.assertEquals(inst4.object.parent, None)
+
+
