@@ -87,7 +87,6 @@ class StartupScriptInstaller:
 
     return "\n# cfgr.StartupOnLaunch START\n{}\n# cfgr.StartupOnLaunch END\n".format(cmd)
 
-
 class LinuxInstaller(StartupScriptInstaller):
   def __init__(self, cwd, data, component, startevent):
     StartupScriptInstaller.__init__(self, "/etc/rc.local", self.getScript(cwd, data, component, startevent), beforeCommand="exit 0")
