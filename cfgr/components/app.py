@@ -1,4 +1,4 @@
-from evento import Event
+from cfgr.event import Event
 import time
 
 class App:

@@ -52,7 +52,7 @@ _cfgr.json (config)_
 
 _components/string.py (component logic)_
 ```python
-from evento import Event
+from cfgr.event import Event
 
 class String:
   """
@@ -82,7 +82,7 @@ class String:
 
 _components/print.py (component logic)_
 ```python
-from evento import Event
+from cfgr.event import Event
 
 class Print:
   """

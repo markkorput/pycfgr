@@ -1,5 +1,5 @@
-from evento import Event
 import re
+from cfgr.event import Event
 from cfgr.Runtime import Runtime
 from cfgr.Json import Loader
 
