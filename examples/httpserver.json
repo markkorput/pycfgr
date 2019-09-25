@@ -1,0 +1,5 @@
+{
+  "App": {"started": "#starthttp"},
+  "App/HttpServer": {"port": 8080, "request-out":"#httprequest", "start":"#starthttp", "verbose":"true"},
+  "App/HttpServer/HttpScope_start": {"scope":"/api/start", "request-in": "#httprequest", "unscoped": "#action_stop", "response":200, "verbose": true}
+}  
