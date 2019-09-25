@@ -3,6 +3,8 @@ import re
 from .Context import Context
 
 class Loader:
+  ID_SEPARATOR = '/'
+
   def __init__(self, runtime, data=None, text=None, file=None, verbose=False):
     self.context = Context(runtime, verbose=verbose)
     self.data = data
@@ -44,8 +46,8 @@ class Loader:
     return childIds
 
   def isDirectChild(self, key, parentKey):
-    pattern = "^{}\.\w+$".format(parentKey)
+    pattern = "^{}{}\w+$".format(parentKey, Loader.ID_SEPARATOR)
     return re.match(pattern, key) != None
 
   def idToType(self, id):
-    return id.split('.')[-1]
+    return id.split(Loader.ID_SEPARATOR)[-1]
