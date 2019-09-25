@@ -1,4 +1,4 @@
-from evento import Event
+from cfgr.event import Event
 import platform, os.path
 
 class StartupScriptInstaller:
@@ -86,7 +86,7 @@ class LaunchOnStartup:
     self.cwd = None
     self.dataPath = None
     self.componentId = None
-    self.startEvent = None
+    self.startEventId = None
     self.doneEvent = Event()
 
   def setCwd(self, cwd):
@@ -99,7 +99,7 @@ class LaunchOnStartup:
     self.componentId = id
 
   def setStartEvent(self, ev):
-    self.startEvent = ev
+    self.startEventId = ev
 
   def install(self):
     installer = self.getInstaller()
@@ -122,11 +122,11 @@ class LaunchOnStartup:
   def getInstaller(self):
     # determine platform
     if platform.system() == 'Linux':
-      installer = LinuxInstaller(self.cwd, self.dataPath, self.componentId, self.startEvent)
+      installer = LinuxInstaller(self.cwd, self.dataPath, self.componentId, self.startEventId)
       return installer
 
     if platform.system() == 'Darwin': # mac
-      installer = DarwinInstaller(self.cwd, self.dataPath, self.componentId, self.startEvent)
+      installer = DarwinInstaller(self.cwd, self.dataPath, self.componentId, self.startEventId)
       return installer
 
     # pass
