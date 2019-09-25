@@ -46,13 +46,15 @@ class StartupScriptInstaller:
 
           with open(self.startupScriptPath, "w") as f:
             f.write(newcontent)
+
+          print('[LaunchOnStartup] startup hook inserted into: {}'.format(self.startupScriptPath))
           return
 
     # simply append to end of file
     with open(self.startupScriptPath, "a") as f:
       f.write("\n"+self.script)
 
-    print('[LaunchOnStartup] startup hook written to: {}'.format(self.startupScriptPath))
+    print('[LaunchOnStartup] startup hook appended to: {}'.format(self.startupScriptPath))
 
   def uninstall(self):
     if not self.isHookInstalled():
