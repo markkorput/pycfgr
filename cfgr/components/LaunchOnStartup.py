@@ -1,5 +1,5 @@
 from cfgr.event import Event
-import platform, os.path
+import platform, os.path, re
 
 class StartupScriptInstaller:
   def __init__(self, startupScriptPath, script, beforeCommand=None):
@@ -25,22 +25,28 @@ class StartupScriptInstaller:
 
     # should be insert our script code before a potential existing command?
     if self.beforeCommand:
-      originalcontent = ''
       if os.path.isfile(self.startupScriptPath):
+        originalcontent = ''
         with open(self.startupScriptPath, "r") as f:
           originalcontent = f.read()
-    
-      # can we find that specified in command in the existing file content?
-      if self.beforeCommand in originalcontent:
-        idx = originalcontent.find(self.beforeCommand)
-        before_part = originalcontent[:idx]
-        after_part = originalcontent[idx:]
-        newcontent = "{}\n\n{}\n\n{}".format(before_part, self.script, after_part)
 
-        with open(self.startupScriptPath, "w") as f:
-          f.write(newcontent)
+        match = re.search('^\s*{}\s*\n'.format(self.beforeCommand), originalcontent)
+        if not match:
+          match = re.search('\n\s*{}\s*\n'.format(self.beforeCommand), originalcontent)
+        if not match:
+          match = re.search('\n\s*{}\s*$'.format(self.beforeCommand), originalcontent)
+        if not match:
+          match = re.search('^\s*{}\s*$'.format(self.beforeCommand), originalcontent)
 
-        return
+        if match:
+          idx = match.span()[0]+1
+          before_part = originalcontent[:idx]
+          after_part = originalcontent[idx:]
+          newcontent = "{}\n{}\n{}".format(before_part, self.script, after_part)
+
+          with open(self.startupScriptPath, "w") as f:
+            f.write(newcontent)
+          return
 
     # simply append to end of file
     with open(self.startupScriptPath, "a") as f:
@@ -77,7 +83,7 @@ class StartupScriptInstaller:
     if startevent:
       cmd = '{} -s {}'.format(cmd, startevent)
 
-    return "# cfgr.StartupOnLaunch START\n{}\n# cfgr.StartupOnLaunch END".format(cmd)
+    return "\n# cfgr.StartupOnLaunch START\n{}\n# cfgr.StartupOnLaunch END\n".format(cmd)
 
 
 class LinuxInstaller(StartupScriptInstaller):
