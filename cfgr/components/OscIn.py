@@ -1,5 +1,5 @@
 import logging, threading
-from evento import Event
+from cfgr.event import Event
 
 try:
     from pythonosc import dispatcher

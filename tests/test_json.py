@@ -1,5 +1,5 @@
 from unittest import TestCase
-from evento import Event
+from cfgr.event import Event
 
 from cfgr import Runtime, Type, Instance, Json
 

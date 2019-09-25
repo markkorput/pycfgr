@@ -1,4 +1,4 @@
-from evento import Event
+from cfgr.event import Event
 from .Type import Type
 from .TypeBuilder import TypeBuilder
 from .PortTools import PortTools

@@ -1,0 +1,7 @@
+{
+  "__INVOKE_FOR_INSTALL_": "python -m cfgr.app -d launch_on_startup.json -s \\#install",
+  "__INVOKE_FOR_UNINSTALL_": "python -m cfgr.app -d launch_on_startup.json -s \\#uninstall",
+
+  "App": {"stop":"#stop"},
+  "App/LaunchOnStartup": {"install": "#install", "uninstall":"#uninstall", "cwd":"./bin", "data":"cfgr.json", "done":"#stop"}
+}

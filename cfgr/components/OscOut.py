@@ -1,4 +1,4 @@
-from evento import Event
+from cfgr.event import Event
 
 try:
     from pythonosc import osc_message_builder

@@ -1,5 +1,4 @@
-from evento import Event
-
+from cfgr.event import Event
 
 class OscMessage:
   """

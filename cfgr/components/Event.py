@@ -1,4 +1,4 @@
-from evento import Event as EventoEvent
+from cfgr.event import Event as EventoEvent
 
 class Event:
   """
