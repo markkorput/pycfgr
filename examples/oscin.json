@@ -1,4 +1,4 @@
 {
   "App": {"started":"#startlistening", "stop":"#stop"},
-  "App.OscIn": {"port": 3002, "connect":"#startlistening", "connected":"#osclistenerconnected", "message":"#oscmessage,#stop", "verbose":true}
+  "App/OscIn": {"port": 3002, "connect":"#startlistening", "connected":"#osclistenerconnected", "message":"#oscmessage,#stop", "verbose":true}
 }

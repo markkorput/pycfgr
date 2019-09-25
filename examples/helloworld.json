@@ -1,0 +1,5 @@
+{
+  "App": {"started":"#appstarted", "stop":"#stopapp", "sleep":0.01},
+  "App/String": {"value": "Hello World!", "in-emit":"#appstarted", "out-emit":"#sayhello,#stopapp"},
+  "App/Print": {"on": "#sayhello"}
+}
