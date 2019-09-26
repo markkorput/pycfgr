@@ -12,11 +12,13 @@ class App:
     builder.addInput('sleep').float_to_method(lambda obj: obj.setSleep)
     # outputs
     builder.addOutput('started').from_event(lambda obj: obj.startedEvent)
+    builder.addOutput('update').from_event(lambda obj: obj.updateEvent)
     builder.addOutput('pid').from_event(lambda obj: obj.pidEvent)
 
   def __init__(self):
     self.startedEvent = Event()
     self.pidEvent = Event()
+    self.updateEvent = Event()
     self.stopEvent = Event()
     self.sleeptime = 0.001
 
@@ -27,6 +29,7 @@ class App:
     self.startedEvent.fire()
 
   def update(self):
+    self.updateEvent()
     # print('update')
     time.sleep(self.sleeptime)
 

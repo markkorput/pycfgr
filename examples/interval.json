@@ -1,0 +1,8 @@
+{
+  "App": {"started":"#startinterval", "update":"#update", "sleep":0.01},
+
+  "App/Interval": {"start": "#startinterval", "ms":1000, "update":"#update", "action":"#sayhello"},
+
+  "App/String": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#printhello"},
+  "App/Print": {"on": "#printhello"}
+}
