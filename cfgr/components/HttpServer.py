@@ -7,18 +7,21 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
 class HttpRequest:
-  def __init__(self, path, respondFunc):
-    self.path = path
+  def __init__(self, handler, respondFunc):
+    self.handler = handler
+    self.path = self.handler.path
+    self.command = self.handler.command
+
     self.respondFunc = respondFunc
 
-  def respondWithCode(code):
+  def respondWithCode(self, code):
     self.respondFunc(code)
   
-  def respond(code, content):
+  def respond(self, code, content):
     self.respondFunc(code, content)
 
 
-def createRequestHandler(requestCallback):
+def createRequestHandler(requestCallback, verbose=False):
   class CustomHandler(SimpleHTTPRequestHandler, object):
     def __init__(self, *args, **kwargs):
       self.responded = False
@@ -45,7 +48,7 @@ def createRequestHandler(requestCallback):
       return
 
     def process_request(self):
-      req = HttpRequest(self.path, self.respond)
+      req = HttpRequest(self, self.respond)
       # urlParseResult = urllib.parse.urlparse(self.path)
       # print('urlpar:', urlParseResult)
       requestCallback(req)
@@ -119,15 +122,15 @@ class HttpServer(threading.Thread):
   def startServer(self):
     self.threading_event = threading.Event()
     self.threading_event.set()
-    self.verbose("Starting http server thread")
+    self.verbose("[HttpServer] starting server thread")
     self.start() # start thread
 
-  def stopServer(self, joinThread=False):
+  def stopServer(self, joinThread=True):
     if not self.isAlive():
       return
 
     self.threading_event.clear()
-    self.verbose('Sending dummy HTTP request to stop HTTP server from blocking...')
+    self.verbose('[HttpServer] sending GET request to stop HTTP server from blocking...')
 
     try:
         connection = http.client.HTTPSConnection("127.0.0.1", self.port)
@@ -144,25 +147,25 @@ class HttpServer(threading.Thread):
 
   # thread function
   def run(self):
-    self.verbose('Starting HTTP server on port {0}'.format(self.port))
-    HandlerClass = createRequestHandler(self.onRequest)
+    self.verbose('[HttpServer] starting server on port {0}'.format(self.port))
+    HandlerClass = createRequestHandler(self.onRequest, verbose=self.isVerbose)
     self.http_server = HTTPServer(('', self.port), HandlerClass)
 
     # self.httpd.serve_forever()
     # self.httpd.server_activate()
     while self.threading_event.is_set(): #not self.kill:
-        try:
-          self.http_server.handle_request()
-        except Exception as exc:
-          print('http exception:')
-          print(exc)
+      try:
+        self.http_server.handle_request()
+      except Exception as exc:
+        print('[HttpServer] exception:')
+        print(exc)
 
-    self.verbose('Closing HTTP server at port {0}'.format(self.port))
+    self.verbose('[HttpServer] closing server at port {0}'.format(self.port))
     self.http_server.server_close()
     self.http_server = None
 
   def onRequest(self, req):
-    self.verbose('[HttpServer] request: {}'.format(str(req)))
+    self.verbose('[HttpServer {}] request from {}'.format(str(req.path), str(req.handler.client_address)))
     self.requestEvent(req)
 
   def setVerbose(self, v):

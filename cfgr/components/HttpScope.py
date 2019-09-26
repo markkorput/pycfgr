@@ -11,31 +11,38 @@ class HttpScope:
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
 
     # outputs
+    builder.addOutput('match').from_event(lambda obj: obj.matchEvent)
     builder.addOutput('unscoped').from_event(lambda obj: obj.unscopedEvent)
 
   def __init__(self):
-    self.unscopedEvent = Event()
+    self.responseCode = None
     self.scope = "/"
     self.isVerbose = False
+
+    self.matchEvent = Event()
+    self.unscopedEvent = Event()
 
   def setScope(self, v):
     self.scope = v
   
   def setResponse(self, val):
-    self.response = val
+    self.responseCode = val
 
   def processRequest(self, req):
     if not self.isMatch(req):
       return
 
+    if self.responseCode:
+      req.respondWithCode(self.responseCode)
+
     self.verbose('[HttpScope {}] match'.format(self.scope))
+    self.matchEvent(req)
 
     if len(self.unscopedEvent) > 0:
       unscoped = self.unscope(req)
       self.unscopedEvent(unscoped)
 
-  def isMatch(self, req):
-    
+  def isMatch(self, req):    
     urlParseResult = urlparse(req.path)
     path = urlParseResult.path
 
@@ -45,7 +52,7 @@ class HttpScope:
     return False
 
   def unscope(self, req):
-    # TODO!
+    
     return req
 
   def setVerbose(self, v):
