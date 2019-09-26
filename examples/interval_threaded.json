@@ -1,0 +1,9 @@
+{
+  "App": {"started":"#startintervalthread", "sleep":0.01},
+
+  "App/Thread": {"start": "#startintervalthread", "started":"#startinterval", "action":"#update", "stop":"#stopintervalthread", "verbose":true},
+  "App/Thread/Interval": {"start": "#startinterval", "ms":1000, "update":"#update", "action":"#sayhello"},
+
+  "App/String": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#printhello"},
+  "App/Print": {"on": "#printhello"}
+}
