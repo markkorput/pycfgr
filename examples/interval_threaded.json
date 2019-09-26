@@ -1,8 +1,10 @@
 {
-  "App": {"started":"#startintervalthread", "sleep":0.01},
+  "App": {"started":"#startintervalthread", "sleep":0.01, "stop":"#stopapp"},
 
-  "App/Thread": {"start": "#startintervalthread", "started":"#startinterval", "action":"#update", "stop":"#stopintervalthread", "verbose":true},
-  "App/Thread/Interval": {"start": "#startinterval", "ms":1000, "update":"#update", "action":"#sayhello"},
+  "App/Thread": {"start": "#startintervalthread", "started":"#startinterval", "action":"#update", "stop":"#stopintervalthread", "stopped": "#stopapp", "verbose":true},
+  "App/Thread/Interval": {"start": "#startinterval", "ms":1000, "update":"#update", "action":"#sayhello,#count"},
+
+  "App/int": {"value":0, "add":"#count", "max":2, "maxExceeded":"#stopintervalthread"},
 
   "App/String": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#printhello"},
   "App/Print": {"on": "#printhello"}

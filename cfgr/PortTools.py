@@ -7,19 +7,19 @@ class Converter:
     self.singleValueCallback(lambda *args, **kwargs: callback())
 
   def onFloat(self, callback):
-    self.convertBeforeCallback(callback, lambda v: float(v))
+    self.convertBeforeCallback(callback, lambda *args: float(args[0]) if len(args) == 1 else 0.0)
 
   def onString(self, callback):
-    self.convertBeforeCallback(callback, lambda v: str(v))
+    self.convertBeforeCallback(callback, lambda *args: str(args[0]) if len(args) == 1 else '')
 
   def onInt(self, callback):
-    self.convertBeforeCallback(callback, lambda v: int(v))
+    self.convertBeforeCallback(callback, lambda *args: int(args[0]) if len(args) == 1 else 0)
 
   def onBool(self, callback):
-    self.convertBeforeCallback(callback, lambda v: bool(v))
+    self.convertBeforeCallback(callback, lambda *args: bool(args[0]) if len(args) == 1 else False)
 
   def onList(self, callback):
-    self.convertBeforeCallback(callback, lambda v: list(v))
+    self.convertBeforeCallback(callback, lambda *args: list(args[0]) if len(args) == 1 else [])
 
   def onValue(self, callback):
     def valuefunc(val):
@@ -38,7 +38,7 @@ class Converter:
     self.singleValueCallback(valuefunc)
 
   def convertBeforeCallback(self, callback, converter):
-    self.singleValueCallback(lambda v: callback(converter(v)))
+    self.singleValueCallback(lambda *args: callback(converter(*args)))
 
   def singleValueCallback(self, callback):
     def valueHandler(*args, **kwargs):
