@@ -12,7 +12,6 @@ class Context:
     Returns a list of pyevento.Event instances for the string-based eventsdata.
     Example of valid eventsdata: "#event1, #event2,#event3" (returns three event instances)
     """
-    # print(eventsdata)
     def iter(v):
       return self.runtime.get_event(v.strip())
 
@@ -42,8 +41,6 @@ class Context:
       input = instance.input(v)
       output = instance.output(v)
 
-
-
       if input and output:
         print('ambiguous attribute name: {}, references both an input and an output port'.format(v))
         continue
@@ -64,7 +61,11 @@ class Context:
         continue
 
       if output:
-        events = self.get_events(attr_data)
+        events = []
+        if (type(attr_data) == type([])):
+          events = list(map(lambda eid: self.runtime.get_event(eid), attr_data))
+        else:
+          events = self.get_events(attr_data)
 
         for e in events:
           output.event.subscribe(e.fire)
