@@ -5,35 +5,35 @@ from cfgr.event import Event
 import http.client
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-
 class HttpRequest:
-  def __init__(self, path, handler, respondFunc):
+  def __init__(self, path, handler):
     self.path = path
     self.handler = handler
-    # self.command = self.handler.command
-
-    self.respondFunc = respondFunc
 
   def respondWithCode(self, code):
-    self.respondFunc(code)
+    self.handler.respond(code)
   
   def respond(self, code, content):
-    self.respondFunc(code, content)
+    self.handler.respond(code, content)
+
+  def respondWithFile(self, filePath):
+    self.handler.respondWithFile(filePath)
 
   def unscope(self, scope):
     parts = urllib.parse.urlsplit(self.path)
     newpath = re.sub('^{}'.format(scope), '', parts.path)
     unscopedreqpath = urllib.parse.urlunsplit((parts.scheme, parts.netloc, newpath, parts.query, parts.fragment))
-    return HttpRequest(unscopedreqpath, self.handler, self.respondFunc)
+    return HttpRequest(unscopedreqpath, self.handler)
 
 def createRequestHandler(requestCallback, verbose=False):
   class CustomHandler(SimpleHTTPRequestHandler, object):
     def __init__(self, *args, **kwargs):
-      self.responded = False
+      self.hasResponded = False
+      self.respondedWithFile = None
       super(CustomHandler, self).__init__(*args, **kwargs)
 
     def respond(self, code=None, body=None, headers=None):
-      self.responded = True
+      self.hasResponded = True
 
       if code == None:
         self.send_response(404)
@@ -52,50 +52,32 @@ def createRequestHandler(requestCallback, verbose=False):
       # self.wfile.close()
       return
 
+    def respondWithFile(self, filePath):
+      self.respondedWithFile = filePath
+
     def process_request(self):
-      req = HttpRequest(self.path, self, self.respond)
-      # urlParseResult = urllib.parse.urlparse(self.path)
-      # print('urlpar:', urlParseResult)
+      req = HttpRequest(self.path, self)
       requestCallback(req)
-      if not self.responded:
-        self.respond(404)
-      return True
+
+      return self.hasResponded
 
     def do_HEAD(self):
-      return self.process_request()
-      # if self.process_request():
-      #   return
-      # super(CustomHandler, self).do_HEAD()
+      if not self.process_request():
+        return
 
     def do_GET(self):
-      self.process_request()
-      # if self.process_request():
-      #   return
-      # super(CustomHandler, self).do_GET()
+      if not self.process_request():
+        super(CustomHandler, self).do_GET()
 
     def do_POST(self):
-      self.process_request()
-      # if self.process_request():
-      #   return
-      # super(CustomHandler, self).do_POST()
+      if not self.process_request():
+        super(CustomHandler, self).do_POST()
 
-    # def translate_path(self, path):
-    #     if self.event_manager != None and 'output_events' in self.options:
-    #         if path in self.options['output_events']:
-    #             self.event_manager.fire(self.options['output_events'][path])
-    #             # self.send_error(204)
-    #             self.send_response(200)
-    #             self.wfile.write('OK')
-    #             self.wfile.close()
-    #             return ''
-
-    #     relative_path = path[1:] if path.startswith('/') else path
-    #     return SimpleHTTPRequestHandler.translate_path(self, os.path.join(self.root_path, relative_path))
-
-    # def _onResponseContent(self, json):
-    #     # self.logger.warn('response CONTENT: '+str(json))
-    #     self.response_type = "application/json"
-    #     self.response_content = json
+    def translate_path(self, path):
+      if self.respondedWithFile:
+        if os.path.isfile(self.respondedWithFile):
+          return self.respondedWithFile
+      return SimpleHTTPRequestHandler.translate_path(self, path)
 
   return CustomHandler
 
@@ -122,13 +104,14 @@ class HttpServer(threading.Thread):
     self.requestEvent = Event()
 
   def __del__(self):
-    self.stop()
+    self.stopServer()
 
   def startServer(self):
     self.threading_event = threading.Event()
     self.threading_event.set()
     self.verbose("[HttpServer] starting server thread")
     self.start() # start thread
+
 
   def stopServer(self, joinThread=True):
     if not self.isAlive():

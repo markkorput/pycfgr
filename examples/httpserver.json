@@ -5,6 +5,8 @@
   "App/HttpServer/HttpScope_api": {"scope":"/api", "request-in": "#httprequest", "unscoped":"#apireq"},
   "App/HttpServer/HttpScope_apihello": {"scope":"/hello", "request-in": "#apireq", "match": "#action_hello", "response":200, "verbose": true},
   "App/HttpServer/HttpScope_apistop": {"scope":"/stop", "request-in": "#apireq", "match": "#action_stop", "response":200, "verbose": true},
+
+  "App/HttpServer/HttpScope_static": {"scope":"/static", "request-in": "#httprequest", "servePath": "./public/", "verbose": true},
   
   "App/String": {"value": "Hello World!", "in-emit":"#action_hello", "out-emit":"#sayhello"},
   "App/Print": {"on": "#sayhello"}

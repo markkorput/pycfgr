@@ -1,5 +1,6 @@
 from cfgr.event import Event
 from urllib.parse import urlparse
+import os.path, re
 
 class HttpScope:
   @staticmethod
@@ -9,6 +10,7 @@ class HttpScope:
     builder.addInput('response').to_method(lambda obj: obj.setResponse)
     builder.addInput('request').to_method(lambda obj: obj.processRequest)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
+    builder.addInput('servePath').string_to_method(lambda obj: obj.setServePath)
 
     # outputs
     builder.addOutput('match').from_event(lambda obj: obj.matchEvent)
@@ -18,6 +20,7 @@ class HttpScope:
     self.responseCode = None
     self.scope = "/"
     self.isVerbose = False
+    self.servePath = None
 
     self.matchEvent = Event()
     self.unscopedEvent = Event()
@@ -28,15 +31,28 @@ class HttpScope:
   def setResponse(self, val):
     self.responseCode = val
 
+  def setServePath(self, p):
+    # strip trailing slash
+    self.servePath = re.sub('/$', '', os.path.abspath(os.path.expanduser(p)))
+
   def processRequest(self, req):
     if not self.isMatch(req):
       return
 
+    self.verbose('[HttpScope {}] match'.format(self.scope))
+    self.matchEvent(req)
+
     if self.responseCode:
       req.respondWithCode(self.responseCode)
 
-    self.verbose('[HttpScope {}] match'.format(self.scope))
-    self.matchEvent(req)
+    if self.servePath:
+      unscoped = req.unscope(self.scope)
+      urlParseResult = urlparse(unscoped.path)
+      requestedFilePath = re.sub('^/', '', urlParseResult.path)
+      
+      servedFilePath = os.path.join(self.servePath, requestedFilePath)
+      self.verbose('[HttpScope] serving static file: {}'.format(servedFilePath))
+      req.respondWithFile(servedFilePath)
 
     if len(self.unscopedEvent) > 0:
       unscoped = req.unscope(self.scope)
