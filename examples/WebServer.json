@@ -1,5 +1,0 @@
-{
-  "WebServer": {"port": 8080, "request-out":"#httprequest"},
-  "WebServer/WebScope_start": {"request-in":"#httprequest", "scope":"/api/start", "scoped-request":"#startrequest"},
-  "WebServer/WebScope_stop": {"request-in":"#httprequest", "scope":"/api/stop", "scoped-request":"#stoprequest"}
-}

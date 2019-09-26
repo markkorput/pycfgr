@@ -38,6 +38,8 @@ class Exe:
     except KeyboardInterrupt:
       print('KeyboardInterrupt, stopping.')
       self.onStop()
+
+    print('Done.')
           
   def onStop(self):
     self.isDone = True
