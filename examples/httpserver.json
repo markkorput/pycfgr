@@ -1,8 +1,10 @@
 {
   "App": {"started": "#starthttp", "stop":"#action_stop"},
   "App/HttpServer": {"port": 8080, "request-out":"#httprequest", "start":"#starthttp", "stop": "#action_stop", "verbose":"true"},
-  "App/HttpServer/HttpScope_hello": {"scope":"/api/hello", "request-in": "#httprequest", "match": "#action_hello", "response":200, "verbose": true},
-  "App/HttpServer/HttpScope_stop": {"scope":"/api/stop", "request-in": "#httprequest", "match": "#action_stop", "response":200, "verbose": true},
+  
+  "App/HttpServer/HttpScope_api": {"scope":"/api", "request-in": "#httprequest", "unscoped":"#apireq"},
+  "App/HttpServer/HttpScope_apihello": {"scope":"/hello", "request-in": "#apireq", "match": "#action_hello", "response":200, "verbose": true},
+  "App/HttpServer/HttpScope_apistop": {"scope":"/stop", "request-in": "#apireq", "match": "#action_stop", "response":200, "verbose": true},
   
   "App/String": {"value": "Hello World!", "in-emit":"#action_hello", "out-emit":"#sayhello"},
   "App/Print": {"on": "#sayhello"}

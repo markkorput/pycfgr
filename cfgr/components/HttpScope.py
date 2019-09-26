@@ -39,21 +39,18 @@ class HttpScope:
     self.matchEvent(req)
 
     if len(self.unscopedEvent) > 0:
-      unscoped = self.unscope(req)
+      unscoped = req.unscope(self.scope)
+      # self.verbose("[HttpScope] unscoped: {}".format(unscoped.path))
       self.unscopedEvent(unscoped)
 
-  def isMatch(self, req):    
+  def isMatch(self, req):
     urlParseResult = urlparse(req.path)
     path = urlParseResult.path
 
-    if path == self.scope:
+    if path.startswith(self.scope):
       return True
 
     return False
-
-  def unscope(self, req):
-    
-    return req
 
   def setVerbose(self, v):
     self.isVerbose = v

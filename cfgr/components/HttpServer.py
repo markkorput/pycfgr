@@ -1,4 +1,4 @@
-import threading, time, socket, os
+import threading, time, socket, os, re
 import urllib.parse
 from cfgr.event import Event
 
@@ -7,10 +7,10 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
 class HttpRequest:
-  def __init__(self, handler, respondFunc):
+  def __init__(self, path, handler, respondFunc):
+    self.path = path
     self.handler = handler
-    self.path = self.handler.path
-    self.command = self.handler.command
+    # self.command = self.handler.command
 
     self.respondFunc = respondFunc
 
@@ -20,6 +20,11 @@ class HttpRequest:
   def respond(self, code, content):
     self.respondFunc(code, content)
 
+  def unscope(self, scope):
+    parts = urllib.parse.urlsplit(self.path)
+    newpath = re.sub('^{}'.format(scope), '', parts.path)
+    unscopedreqpath = urllib.parse.urlunsplit((parts.scheme, parts.netloc, newpath, parts.query, parts.fragment))
+    return HttpRequest(unscopedreqpath, self.handler, self.respondFunc)
 
 def createRequestHandler(requestCallback, verbose=False):
   class CustomHandler(SimpleHTTPRequestHandler, object):
@@ -48,7 +53,7 @@ def createRequestHandler(requestCallback, verbose=False):
       return
 
     def process_request(self):
-      req = HttpRequest(self, self.respond)
+      req = HttpRequest(self.path, self, self.respond)
       # urlParseResult = urllib.parse.urlparse(self.path)
       # print('urlpar:', urlParseResult)
       requestCallback(req)
