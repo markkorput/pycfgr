@@ -119,7 +119,7 @@ class StartupScriptInstaller:
     if self.localScriptPath:
       if os.path.exists(self.localScriptPath):
         os.remove(self.localScriptPath)
-        print('local script file ({}) removed'.format(self.startupScriptPath, self.localScriptPath))
+        print('[LaunchOnStartup] local script file ({}) removed'.format(self.localScriptPath))
 
     return True
 
