@@ -50,65 +50,7 @@ _cfgr.json (config)_
 }
 ```
 
-_components/string.py (component logic)_
-```python
-from cfgr.event import Event
-
-class String:
-  """
-  A simple string-value component
-  """
-
-  def __init__(self):
-    self.value = None
-    self.emitEvent = Event()
-    
-
-  def setValue(self, v):
-    self.value = v
-
-  def emit(self):
-    self.emitEvent(self.value)previ
-
-  @staticmethod
-  def cfgr(builder):
-    ## outputs
-    builder.addInput('value').string(lambda val,obj: obj.setValue(val))
-    builder.addInput('emit').signal_to_method(lambda obj: obj.emit)
-
-    ## outputs
-    builder.addOutput('emit').from_event(lambda obj: obj.emitEvent)
-```
-
-_components/print.py (component logic)_
-```python
-from cfgr.event import Event
-
-class Print:
-  """
-  A simple text-printing component
-  """
-  def print(self, v):
-    print(v)
-
-  @staticmethod
-  def cfgr(builder):
-    ## outputs
-    builder.addInput('on').string_to_method(lambda val,obj: obj.print)
-```
-
+Invoke the above configuration using the default cfgr.app:
 ```bash
-python -m cfgr.app cfgr.json # uses the default cfgr.app runner
-```
-
-### Osc Sender
-
-_cfgr.json_
-```json
-{
-  "App": {"started":"#sendtest,#sendplay,#stop", "stop":"#stop"},
-  "App.OscOut": {"host": "127.0.0.1", "port": 3002, "in-send": "#sendmsg"},
-  "App.OscMessage": {"address": "/test", "params": ["test", 1, 2, 3], "in-send": "#sendtest", "out-send": "#sendmsg"},
-  "App.OscMessage": {"address": "/play", "params": ["test", 1, 2, 3], "in-send": "#sendplay", "out-send": "#sendmsg"}
-}
+python -m cfgr.app --data ./cfgr.json # uses the default cfgr.app runner
 ```
