@@ -40,15 +40,20 @@ class HttpFileHandler:
     #     self.wfile.write(reply_body.encode('utf-8'))
     #     return
 
-    filename = self.saveTo if self.saveTo else os.path.basename(req.path)
+    self.verbose('[HttpFileHandler] headers: {}'.format(req.handler.headers))
+
+    if not self.saveTo:
+      req.respond(501, 'Not Implemented')
+      return
+
+    filename = self.saveTo # if self.saveTo else os.path.basename(req.path)
     file_length = int(req.handler.headers['Content-Length'])
     with open(filename, 'wb') as output_file:
       output_file.write(req.handler.rfile.read(file_length))
     self.verbose('[HttpFileHandler] wrote {} bytes to: {}'.format(file_length, filename))
 
     req.handler.send_response(201, 'Created')
-    req.handler.end_headers()
-    
+    req.handler.end_headers()    
     reply_body = 'Saved "%s"\n' % filename
     req.handler.wfile.write(reply_body.encode('utf-8'))
 

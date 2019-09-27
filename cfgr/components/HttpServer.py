@@ -3,7 +3,7 @@ import urllib.parse
 from cfgr.event import Event
 
 import http.client
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import HTTPServer, CGIHTTPRequestHandler #SimpleHTTPRequestHandler
 
 class HttpRequest:
   def __init__(self, path, handler, method='GET'):
@@ -27,7 +27,7 @@ class HttpRequest:
     return HttpRequest(unscopedreqpath, self.handler, method=self.method)
 
 def createRequestHandler(requestCallback, verbose=False):
-  class CustomHandler(SimpleHTTPRequestHandler, object):
+  class CustomHandler(CGIHTTPRequestHandler, object):
     def __init__(self, *args, **kwargs):
       self.hasResponded = False
       self.respondedWithFile = None
@@ -82,7 +82,7 @@ def createRequestHandler(requestCallback, verbose=False):
       if self.respondedWithFile:
         if os.path.isfile(self.respondedWithFile):
           return self.respondedWithFile
-      return SimpleHTTPRequestHandler.translate_path(self, path)
+      return CGIHTTPRequestHandler.translate_path(self, path)
 
   return CustomHandler
 
