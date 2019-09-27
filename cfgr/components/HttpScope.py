@@ -11,6 +11,7 @@ class HttpScope:
     builder.addInput('request').to_method(lambda obj: obj.processRequest)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
     builder.addInput('servePath').string_to_method(lambda obj: obj.setServePath)
+    builder.addInput('method').string_to_method(lambda obj: obj.setMethod)
 
     # outputs
     builder.addOutput('match').from_event(lambda obj: obj.matchEvent)
@@ -21,6 +22,7 @@ class HttpScope:
     self.scope = "/"
     self.isVerbose = False
     self.servePath = None
+    self.method = None
 
     self.matchEvent = Event()
     self.unscopedEvent = Event()
@@ -34,6 +36,9 @@ class HttpScope:
   def setServePath(self, p):
     # strip trailing slash
     self.servePath = re.sub('/$', '', os.path.abspath(os.path.expanduser(p)))
+
+  def setMethod(self, v):
+    self.method = v
 
   def processRequest(self, req):
     if not self.isMatch(req):
@@ -60,6 +65,9 @@ class HttpScope:
       self.unscopedEvent(unscoped)
 
   def isMatch(self, req):
+    if self.method and not req.method == self.method:
+      return False
+
     urlParseResult = urlparse(req.path)
     path = urlParseResult.path
 

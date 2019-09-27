@@ -6,9 +6,10 @@ import http.client
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 class HttpRequest:
-  def __init__(self, path, handler):
+  def __init__(self, path, handler, method='GET'):
     self.path = path
     self.handler = handler
+    self.method = method
 
   def respondWithCode(self, code):
     self.handler.respond(code)
@@ -23,7 +24,7 @@ class HttpRequest:
     parts = urllib.parse.urlsplit(self.path)
     newpath = re.sub('^{}'.format(scope), '', parts.path)
     unscopedreqpath = urllib.parse.urlunsplit((parts.scheme, parts.netloc, newpath, parts.query, parts.fragment))
-    return HttpRequest(unscopedreqpath, self.handler)
+    return HttpRequest(unscopedreqpath, self.handler, method=self.method)
 
 def createRequestHandler(requestCallback, verbose=False):
   class CustomHandler(SimpleHTTPRequestHandler, object):
@@ -55,23 +56,27 @@ def createRequestHandler(requestCallback, verbose=False):
     def respondWithFile(self, filePath):
       self.respondedWithFile = filePath
 
-    def process_request(self):
-      req = HttpRequest(self.path, self)
+    def process_request(self, method='GET'):
+      req = HttpRequest(self.path, self, method=method)
       requestCallback(req)
 
       return self.hasResponded
 
     def do_HEAD(self):
-      if not self.process_request():
-        return
+      if not self.process_request(method='HEAD'):
+        super(CustomHandler, self).do_HEAD()
 
     def do_GET(self):
-      if not self.process_request():
+      if not self.process_request(method='GET'):
         super(CustomHandler, self).do_GET()
 
     def do_POST(self):
-      if not self.process_request():
+      if not self.process_request(method='POST'):
         super(CustomHandler, self).do_POST()
+
+    def do_PUT(self):
+      if not self.process_request(method='PUT'):
+        super(CustomHandler, self).do_PUT()
 
     def translate_path(self, path):
       if self.respondedWithFile:
