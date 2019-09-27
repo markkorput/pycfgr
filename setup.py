@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name='cfgr',
-  version='0.0.1',
+  version='0.0.2',
   description='cfgr separates logic from data',
   long_description=long_description,
   long_description_content_type='text/markdown',
