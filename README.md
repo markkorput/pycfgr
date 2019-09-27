@@ -1,7 +1,9 @@
 # cfgr
 [![Build Status](https://travis-ci.org/markkorput/pycfgr.svg)](https://travis-ci.org/markkorput/pycfgr)
 
+## Install
 
+```pip install cfgr```
 
 ## What is it?
 

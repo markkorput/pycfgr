@@ -14,7 +14,7 @@ setuptools.setup(
   author_email='shortnotion@gmail.com',
   license='MIT',
   packages=setuptools.find_packages(), #['cfgr'],
-  #install_requires=['evento', 'python-osc'],
+  install_requires=['evento', 'python-osc'],
   test_suite='nose.collector',
   tests_require=['nose'],
   zip_safe=False)
