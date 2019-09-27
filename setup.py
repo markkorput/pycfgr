@@ -2,7 +2,8 @@ import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-setup(
+
+setuptools.setup(
   name='cfgr',
   version='0.0.1',
   description='cfgr separates logic from data',
