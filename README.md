@@ -17,9 +17,9 @@ Cfgr provides a set of APIs that encourage separation of configuration from logi
 
 The approach borrows concepts from Visual Programming Languages (VPLs) which generally let you create instances of pre-built building blocks and connect them together to perform complex tasks. These concepts are translated back into a text-based workflow.
 
-[<img src="docs/vpl-02-maxmsp.png" alt="MaxMSP" height="150" />](https://github.com/markkorput/pycfgr/raw/master/docs/vpl-02-maxmsp.png)
-[<img src="docs/vpl-01-blueprints.jpg" alt="Blueprints" height="150" />](https://github.com/markkorput/pycfgr/raw/master/docs/vpl-01-blueprints.jpg)
-[<img src="docs/vpl-03-touchdesigner.png" alt="TouchDesigner" height="150" />](https://github.com/markkorput/pycfgr/raw/master/docs/vpl-03-touchdesigner.png)
+[<img src="https://github.com/markkorput/pycfgr/raw/master/docs/vpl-02-maxmsp.png" alt="MaxMSP" height="150" />](https://github.com/markkorput/pycfgr/raw/master/docs/vpl-02-maxmsp.png)
+[<img src="https://github.com/markkorput/pycfgr/raw/master/docs/vpl-01-blueprints.jpg" alt="Blueprints" height="150" />](https://github.com/markkorput/pycfgr/raw/master/docs/vpl-01-blueprints.jpg)
+[<img src="https://github.com/markkorput/pycfgr/raw/master/docs/vpl-03-touchdesigner.png" alt="TouchDesigner" height="150" />](https://github.com/markkorput/pycfgr/raw/master/docs/vpl-03-touchdesigner.png)
 
 _three famous examples of VPLs (from left to right); [Cyling '74's Max](https://cycling74.com/products/max/), [Unreal Engine's Blueprints](https://docs.unrealengine.com/en-US/Engine/Blueprints/index.html) and [Derivative's TouchDesigner](http://derivative.ca)_
 
