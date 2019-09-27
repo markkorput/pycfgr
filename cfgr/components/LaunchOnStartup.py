@@ -1,5 +1,6 @@
 from cfgr.event import Event
-import platform, os.path, re, sys
+import platform, os, re, sys, stat
+
 
 def getScript(cwd, data, component, startevent=None, background=True, outfile=None):
   # to make sure we'll uses the currently active python
@@ -20,7 +21,7 @@ def getScript(cwd, data, component, startevent=None, background=True, outfile=No
     cmd = '{} -s {}'.format(cmd, startevent)
 
   if outfile:
-    cmd = '{} &>> {}'.format(cmd, os.path.abspath(outfile))
+    cmd = '{} >> {}'.format(cmd, os.path.abspath(outfile))
 
   if background:
     cmd = '{} &'.format(cmd)
@@ -61,7 +62,12 @@ class StartupScriptInstaller:
       
       with open(self.localScriptPath, "w") as f:
         f.write(self.localScript)
-        print('[LaunchOnStartup] local script file written to: {}'.format(self.localScriptPath))
+
+      # make local script executable
+      st = os.stat(self.localScriptPath)
+      os.chmod(self.localScriptPath, st.st_mode | stat.S_IEXEC)
+
+      print('[LaunchOnStartup] local script file written to: {}'.format(self.localScriptPath))
 
     if self.isHookInstalled():
       print('[LaunchOnStartup] hook already installed')
