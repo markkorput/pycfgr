@@ -8,7 +8,7 @@ def getScript(cwd, data, component, startevent=None, background=True, outfile=No
   cmd = '{} -m cfgr.app'.format(sys.executable)
 
   if cwd:
-    cmd = 'cd {} && {}'.format(cwd, cmd)
+    cmd = 'cd {} && {}'.format(os.path.abspath(cwd), cmd)
 
   if data:
     cmd = '{} -d {}'.format(cmd, data)
@@ -147,7 +147,7 @@ class LaunchOnStartup:
     builder.addOutput('done').from_event(lambda obj: obj.doneEvent)
 
   def __init__(self):
-    self.cwd = None
+    self.cwd = '.'
     self.dataPath = None
     self.componentId = None
     self.startEventId = None
