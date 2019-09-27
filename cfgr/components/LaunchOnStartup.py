@@ -20,7 +20,7 @@ def getScript(cwd, data, component, startevent=None, background=True, outfile=No
     cmd = '{} -s {}'.format(cmd, startevent)
 
   if outfile:
-    cmd = '{} &>> {}'.format(cmd, outfile)
+    cmd = '{} &>> {}'.format(cmd, os.path.abspath(outfile))
 
   if background:
     cmd = '{} &'.format(cmd)
@@ -125,11 +125,11 @@ class StartupScriptInstaller:
 
 class LinuxInstaller(StartupScriptInstaller):
   def __init__(self, cwd, data, component, startevent):
-    StartupScriptInstaller.__init__(self, "/etc/rc.local", getScript(cwd, data, component, startevent), localScriptPath="./launch_on_startup.sh", beforeCommand="exit 0")
+    StartupScriptInstaller.__init__(self, "/etc/rc.local", getScript(cwd, data, component, startevent, outfile='cfgr.log'), localScriptPath="./launch_on_startup.sh", beforeCommand="exit 0")
 
 class DarwinInstaller(StartupScriptInstaller): # TODO
   def __init__(self, cwd, data, component, startevent):
-    StartupScriptInstaller.__init__(self, "rc.local.test", getScript(cwd, data, component, startevent), localScriptPath="./launch_on_startup.sh", beforeCommand="exit 0")
+    StartupScriptInstaller.__init__(self, "rc.local.test", getScript(cwd, data, component, startevent, outfile='cfgr.log'), localScriptPath="./launch_on_startup.sh", beforeCommand="exit 0")
 
 class LaunchOnStartup:
   """
