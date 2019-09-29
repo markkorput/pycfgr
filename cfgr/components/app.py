@@ -21,11 +21,12 @@ class App:
     self.updateEvent = Event()
     self.stopEvent = Event()
     self.sleeptime = 0.001
+    self.isActive = False
 
   def start(self):
     pid = os.getpid()
-    # print('pid: ', pid)
     self.pidEvent(os.getpid())
+    self.isActive = True
     self.startedEvent.fire()
 
   def update(self):
@@ -38,4 +39,5 @@ class App:
     self.sleeptime = val
 
   def onStop(self, *args, **kwargs):
+    self.isActive = False
     self.stopEvent()
