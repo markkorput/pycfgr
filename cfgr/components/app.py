@@ -8,20 +8,23 @@ class App:
   @staticmethod
   def cfgr(builder):
     # inputs
-    builder.addInput('stop').signal_to_method(lambda obj: obj.onStop)
+    builder.addInput('stop').signal_to_method(lambda obj: obj.stop)
     builder.addInput('sleep').float_to_method(lambda obj: obj.setSleep)
     # outputs
     builder.addOutput('started').from_event(lambda obj: obj.startedEvent)
     builder.addOutput('update').from_event(lambda obj: obj.updateEvent)
     builder.addOutput('pid').from_event(lambda obj: obj.pidEvent)
+    builder.addOutput('stopped').from_event(lambda obj: obj.stoppedEvent)
 
   def __init__(self):
     self.startedEvent = Event()
     self.pidEvent = Event()
     self.updateEvent = Event()
-    self.stopEvent = Event()
+    
     self.sleeptime = 0.001
     self.isActive = False
+
+    self.stoppedEvent = Event()
 
   def start(self):
     pid = os.getpid()
@@ -38,6 +41,6 @@ class App:
     # print('setsleep: {}'.format(val))
     self.sleeptime = val
 
-  def onStop(self, *args, **kwargs):
+  def stop(self, *args, **kwargs):
     self.isActive = False
-    self.stopEvent()
+    self.stoppedEvent()

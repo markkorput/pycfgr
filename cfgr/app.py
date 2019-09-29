@@ -34,6 +34,8 @@ def main(dataPath=None, componentId=None, startEvent=None, verbose=False):
         app.update()
   except KeyboardInterrupt:
     print('KeyboardInterrupt, stopping.')
+    if isDefaultApp:
+      app.stop()
 
   # print('Done.')
 
