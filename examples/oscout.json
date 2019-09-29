@@ -1,7 +1,7 @@
 {
   "App": {"started":"#sendtest,#sendplay,#stop", "stop":"#stop"},
   "App/OscOut": {"host": "127.0.0.1", "port": 3002, "in-send": "#msg", "verbose":true},
-  "App/OscOut/OscMessage_1": {"address": "/test", "data": ["test", 1, 2, 3], "in-send": "#sendtest", "out-send": "#msg", "verbose":false},
-  "App/OscOut/OscMessage_2": {"address": "/play", "data": ["test", 1, 2, 3], "in-send": "#sendplay", "out-send": "#msg", "verbose":false}
+  "App/OscOut/OscMessage#1": {"address": "/test", "data": ["test", 1, 2, 3], "in-send": "#sendtest", "out-send": "#msg", "verbose":false},
+  "App/OscOut/OscMessage#2": {"address": "/play", "data": ["test", 1, 2, 3], "in-send": "#sendplay", "out-send": "#msg", "verbose":false}
 }
 

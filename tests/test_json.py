@@ -38,10 +38,10 @@ class TestJson(TestCase):
 
   def test_apply(self):
     json_text = '{\
-      "Product_1": {"name": "Product #1", "reset":"#Reset1" },\
-      "Product_2": {"name": "Product no. 2", "afterReset": "#Reset1, #reset3" },\
-      "Product_3": {"name": "Product3", "reset": "#reset3", "parent": "Product_1" },\
-      "Product_3/Product_4": {"name": "Product4" }\
+      "Product#1": {"name": "Product #1", "reset":"#Reset1" },\
+      "Product#2": {"name": "Product no. 2", "afterReset": "#Reset1, #reset3" },\
+      "Product#3": {"name": "Product3", "reset": "#reset3", "parent": "Product#1" },\
+      "Product#3/Product#4": {"name": "Product4" }\
     }'
 
     # create runtime
@@ -51,9 +51,9 @@ class TestJson(TestCase):
     
     loader = Json.Loader(runtime=runtime, text=json_text)
 
-    inst1 = loader.create("Product_1")
-    inst2 = loader.create("Product_2")
-    inst3 = loader.create("Product_3")
+    inst1 = loader.create("Product#1")
+    inst2 = loader.create("Product#2")
+    inst3 = loader.create("Product#3")
     inst4 = runtime.instances[3]
 
     self.assertEquals(inst1.object.name, 'Product #1')
