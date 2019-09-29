@@ -6,10 +6,10 @@ from .discover import addAllTypes
 DEFAULT_DATA_PATH = 'cfgr.json'
 DEFAULT_COMPONENT = 'App'
 
-def main(dataPath=None, componentId=None, startEvent=None, verbose=False):
+def main(dataPath=None, componentId=None, startEvent=None, verbose=False, customTypeClasses=[]):
   # prepare runtime with all component types
   runtime = Runtime()
-  addAllTypes(runtime)
+  addAllTypes(runtime, customTypeClasses=customTypeClasses)
 
   # create our json loader
   loader = Json.Loader(runtime=runtime, file=dataPath if dataPath else DEFAULT_DATA_PATH, verbose=verbose)
@@ -40,7 +40,7 @@ def main(dataPath=None, componentId=None, startEvent=None, verbose=False):
   # print('Done.')
 
 
-if __name__ == '__main__':
+def run(customTypeClasses=[]):
   parser = OptionParser()
   parser.add_option('-d', '--data', dest='data', default=None)
   parser.add_option('-c', '--create', dest='create', default=None)
@@ -48,4 +48,7 @@ if __name__ == '__main__':
   parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False)
   opts, args = parser.parse_args()
 
-  main(dataPath=opts.data, componentId=opts.create, startEvent=opts.startevent, verbose=opts.verbose)
+  main(dataPath=opts.data, componentId=opts.create, startEvent=opts.startevent, verbose=opts.verbose, customTypeClasses=customTypeClasses)
+
+if __name__ == '__main__':
+  run()
