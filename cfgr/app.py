@@ -3,50 +3,44 @@ from optparse import OptionParser
 from cfgr import Runtime, Json
 from .discover import addAllTypes
 
-class Exe:
-  DEFAULT_DATA_PATH = 'cfgr.json'
-  DEFAULT_COMPONENT = 'App'
+DEFAULT_DATA_PATH = 'cfgr.json'
+DEFAULT_COMPONENT = 'App'
 
-  def __init__(self, data_path=None, component_id=None, start_event=None, verbose=False):
-    self.runtime = Runtime()
-    addAllTypes(self.runtime)
+def main(dataPath=None, componentId=None, startEvent=None, verbose=False, customTypeClasses=[]):
+  # prepare runtime with all component types
+  runtime = Runtime()
+  addAllTypes(runtime, customTypeClasses=customTypeClasses)
 
+  # create our json loader
+  loader = Json.Loader(runtime=runtime, file=dataPath if dataPath else DEFAULT_DATA_PATH, verbose=verbose)
 
-    self.componentId = component_id
-    self.verbose = verbose
-    self.isDone = False
-    self.start_event = start_event
-    self.loader = Json.Loader(runtime=self.runtime, file=data_path if data_path else Exe.DEFAULT_DATA_PATH, verbose=self.verbose)
+  # instantiate our root component (including the complete sub-hierarchy)
+  isDefaultApp = componentId == None
+  inst = loader.create(DEFAULT_COMPONENT if isDefaultApp else componentId, recursive=True)
+  app = inst.object if isDefaultApp else None
 
-  def run(self):
-    isDefaultApp = self.componentId == None
-    inst = self.loader.create(Exe.DEFAULT_COMPONENT if isDefaultApp else self.componentId, recursive=True)
-    self.app = inst.object if isDefaultApp else None
+  # if we've instantiated the default App component, give it its start signal
+  if isDefaultApp:
+    app.start()
 
+  # if we've received a startEvent command line option; trigger the specified event(s)
+  if startEvent:
+    for e in loader.context.get_events(startEvent):
+      e.fire()
+
+  try:
+    while not isDefaultApp or app.isActive:
+      if isDefaultApp:
+        app.update()
+  except KeyboardInterrupt:
+    print('KeyboardInterrupt, stopping.')
     if isDefaultApp:
-      self.app.stopEvent += self.onStop
-      self.app.start()
+      app.stop()
 
-    if self.start_event:
-      for e in self.loader.context.get_events(self.start_event):
-        e.fire()
-
-    try:
-      while not self.isDone:
-        if isDefaultApp:
-          self.app.update()
-    except KeyboardInterrupt:
-      print('KeyboardInterrupt, stopping.')
-      self.onStop()
-
-    # print('Done.')
-          
-  def onStop(self):
-    self.isDone = True
+  # print('Done.')
 
 
-if __name__ == '__main__':
-
+def run(customTypeClasses=[]):
   parser = OptionParser()
   parser.add_option('-d', '--data', dest='data', default=None)
   parser.add_option('-c', '--create', dest='create', default=None)
@@ -54,5 +48,7 @@ if __name__ == '__main__':
   parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False)
   opts, args = parser.parse_args()
 
-  exe = Exe(data_path=opts.data, component_id=opts.create, start_event=opts.startevent, verbose=opts.verbose)
-  exe.run()
+  main(dataPath=opts.data, componentId=opts.create, startEvent=opts.startevent, verbose=opts.verbose, customTypeClasses=customTypeClasses)
+
+if __name__ == '__main__':
+  run()

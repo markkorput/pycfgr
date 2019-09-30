@@ -6,6 +6,6 @@
 
   "App/int": {"value":0, "add":"#count", "max":2, "maxExceeded":"#stopintervalthread"},
 
-  "App/String": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#printhello"},
+  "App/string": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#printhello"},
   "App/Print": {"on": "#printhello"}
 }

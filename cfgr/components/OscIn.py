@@ -1,13 +1,19 @@
 import logging, threading
 from cfgr.event import Event
 
-try:
+DEPS = None # {'osc_server': None, 'dispatcher': None}
+
+def loadDeps():
+  result = {}
+  try:
     from pythonosc import dispatcher
     from pythonosc import osc_server
-except ImportError:
+    result['osc_server'] = osc_server
+    result['dispatcher'] = dispatcher
+  except ImportError:
     logging.getLogger(__name__).warning("failed to load pythonosc dependency; osc_input component will not work")
-    osc_server = None
-    dispatcher = None
+
+  return result
 
 class OscIn:
   
@@ -25,7 +31,7 @@ class OscIn:
     builder.addOutput('disconnected').from_event(lambda obj: obj.disconnectedEvent)
 
   def __init__(self):
-    self.osc_server = None
+    self.server = None
     self.isConnected = False
     self.running = False
     # self.osc_map = None
@@ -48,26 +54,32 @@ class OscIn:
     if self.isConnected:
       return False
 
-    if osc_server == None:
+    if not DEPS:
+      DEPS = loadDeps()
+
+    if not DEPS['osc_server'] or not DEPS['dispatcher']:
+      return False
+
+    if DEPS['osc_server'] == None:
       print('[OscIn] pythonosc not available')
       return False
 
-    disp = dispatcher.Dispatcher()
+    disp = DEPS['dispatcher'].Dispatcher()
     disp.map("*", self._onOscMsg)
     # disp.map("/logvolume", print_compute_handler, "Log volume", math.log)
 
     result = False
     try:
-      self.osc_server = osc_server.ThreadingOSCUDPServer((self.host, self.port), disp)
-      self.osc_server.daemon_threads = True
-      self.osc_server.timeout = 1.0
-      # self.osc_server = osc_server.BlockingOSCUDPServer((self.host, self.port), disp)
+      self.server = DEPS['osc_server'].ThreadingOSCUDPServer((self.host, self.port), disp)
+      self.server.daemon_threads = True
+      self.server.timeout = 1.0
+      # self.server = DEPS['osc_server'].BlockingOSCUDPServer((self.host, self.port), disp)
       def threadFunc():
           try:
-              self.osc_server.serve_forever()
+              self.server.serve_forever()
           except KeyboardInterrupt:
               pass
-          self.osc_server.server_close()
+          self.server.server_close()
 
       self.thread = threading.Thread(target = threadFunc);
       self.thread.start()
@@ -86,10 +98,10 @@ class OscIn:
 
   def disconnect(self):
     if self.isConnected:
-      if self.osc_server:
-        self.osc_server._BaseServer__shutdown_request = True
-        self.osc_server.shutdown()
-        self.osc_server = None
+      if self.server:
+        self.server._BaseServer__shutdown_request = True
+        self.server.shutdown()
+        self.server = None
       self.isConnected = False
       self.disconnectedEvent(self)
       self.verbose('[OscIn] server stopped @ {0}:{1}'.format(self.host, str(self.port)))

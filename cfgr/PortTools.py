@@ -72,7 +72,7 @@ class Converter:
     return str(data).strip().startswith('#')
 
   def isRuntimeConstant(self, val):
-    return val == '$runtime'
+    return type(val) == type('') and val == '$runtime'
 
 class PortTools:
   """

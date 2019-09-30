@@ -2,6 +2,10 @@ from cfgr.event import Event
 import re
 
 class Context:
+  
+  ID_SEPARATOR = '/'
+  NAME_SEPARATOR = '#'
+
   def __init__(self, runtime, verbose=False):
     self.runtime = runtime
     self.runtime.port_tools.eventsFunc = self.get_events
@@ -33,8 +37,10 @@ class Context:
     return inst
 
   def _defaultTypeFor(self, id):
-    split = id.split('_')
-    return split[0] if len(split) == 2 else id
+    split = id.split(Context.ID_SEPARATOR)[-1].split(Context.NAME_SEPARATOR)
+    typ = split[0] if len(split) == 2 else id
+    # print('_defaultTypeFor: {} --> {}'.format(id, typ))
+    return typ
 
   def cfg(self, instance, data):
     for v in data:
