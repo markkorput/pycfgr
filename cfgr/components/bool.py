@@ -24,10 +24,13 @@ class bool:
 
   def setValue(self, v):
     change = self.value != v
+    
+    if change:
+      self.verbose('[bool] change {} -> {}'.format(self.value, v))
+
     self.value = v
 
     if change:
-      self.verbose('[bool] change, new value: {}'.format(v))
       self.changeEvent(self.value)
       if self.value == True:
         self.trueEvent()
@@ -35,6 +38,7 @@ class bool:
         self.falseEvent()
 
   def emit(self):
+    self.verbose('[bool {}] emit'.format(self.value))
     self.emitEvent(self.value)
   
   def setVerbose(self, v):

@@ -23,7 +23,6 @@ class int:
     self.emitEvent = Event()
     self.maxExceededEvent = Event()
 
-
   def setValue(self, v):
     if self.max != None:
       if v > self.max:
