@@ -33,7 +33,21 @@ class Cmd:
     self.executingEvent()
     # os.system(self.cmd)
 
-    p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
+    p = None
+    try:
+      
+      p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
+    except FileNotFoundError as err:
+      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+      p = None
+    except Exception as err:
+      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+      p = None
+
+    if p == None:
+      # TODO fire failure event?
+      return
+
     self.executedEvent()
 
     # do we have listeners that are interested in stdout?
