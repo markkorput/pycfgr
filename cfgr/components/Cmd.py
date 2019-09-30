@@ -7,7 +7,7 @@ class Cmd:
   def cfgr(builder):
     # inputs
     builder.addInput('execute').signal_to_method(lambda obj: obj.execute)
-    builder.addInput('cmd').to_method(lambda obj: obj.setCmd)
+    builder.addInput('cmd').list_to_method(lambda obj: obj.setCmd)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
 
     # outputs

@@ -19,10 +19,31 @@ class Converter:
     self.convertBeforeCallback(callback, lambda *args: bool(args[0]) if len(args) == 1 else False)
 
   def onList(self, callback):
-    self.convertBeforeCallback(callback, lambda *args: list(args[0]) if len(args) == 1 else [])
+    # self.convertBeforeCallback(callback, lambda *args: list(args[0]) if len(args) == 1 else [])
+    def valueHandler(*args, **kwargs):
+      if len(args) < 1:
+        return
+      value = args[0]
+
+      if type(value) in [type([]), type(())]:
+        callback(list(value))
+        return
+
+      if self.isEventData(value):
+        evts = self.tools.getEvents(value)
+        for e in evts:
+          e += valueHandler
+
+    self.event += valueHandler
 
   def onValue(self, callback):
-    def valuefunc(val):
+    def valuefunc(*args, **kwargs):
+      if len(args) == 0:
+        callback()
+        return
+
+      val = args[0]
+
       if self.isEventData(val):
         for e in self.tools.getEvents(val):
           e.subscribe += callback
@@ -61,8 +82,17 @@ class Converter:
         callback()
         return
 
-      vals = args[0].split(',') if  isinstance(args[0], str) else [args[0]]
+      value = args[0]
+      vals = []
+      if type(value) == type(''):
+        vals = args[0].split(',')
+      if type(value) == type([]) or type(value) == type(()):
+        vals = value
+      else:
+        vals = [value]
+
       for val in vals:
+        print('val: {}'.format(val))
         callback(val)
 
     self.event += valueHandler

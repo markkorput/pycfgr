@@ -23,6 +23,7 @@ class bool:
     self.falseEvent = Event()
 
   def setValue(self, v):
+    # print('[bool] setValue {}'.format(v))
     change = self.value != v
     
     if change:
