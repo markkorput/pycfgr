@@ -1,5 +1,5 @@
 {
   "App": {"pid":["#pid","#print"], "stop":"#stopapp"},
-  "App/String": {"value":"#pid", "in-emit":"#print", "out-emit":"#printval,#stopapp"},
+  "App/string": {"value":"#pid", "in-emit":"#print", "out-emit":"#printval,#stopapp"},
   "App/Print": {"on": "#printval"}
 }

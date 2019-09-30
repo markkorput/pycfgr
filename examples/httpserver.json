@@ -8,6 +8,6 @@
 
   "App/HttpServer/HttpScope#static": {"scope":"/static", "request-in": "#httprequest", "servePath": "./public/", "verbose": true},
   
-  "App/String": {"value": "Hello World!", "in-emit":"#action_hello", "out-emit":"#sayhello"},
+  "App/string": {"value": "Hello World!", "in-emit":"#action_hello", "out-emit":"#sayhello"},
   "App/Print": {"on": "#sayhello"}
 }  

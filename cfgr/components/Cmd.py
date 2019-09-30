@@ -7,7 +7,7 @@ class Cmd:
   def cfgr(builder):
     # inputs
     builder.addInput('execute').signal_to_method(lambda obj: obj.execute)
-    builder.addInput('cmd').string_to_method(lambda obj: obj.setCmd)
+    builder.addInput('cmd').to_method(lambda obj: obj.setCmd)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
 
     # outputs
@@ -33,7 +33,7 @@ class Cmd:
     self.executingEvent()
     # os.system(self.cmd)
 
-    p = subprocess.Popen([self.cmd], stdout=subprocess.PIPE)
+    p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
     self.executedEvent()
 
     # do we have listeners that are interested in stdout?

@@ -58,7 +58,7 @@ python -m cfgr.app --data <path/to/configuration.json>
 ```json
 {
   "App": {"started":"#sayhello", "stop":"#stopapp"},
-  "App.String": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#print,#stopapp"},
+  "App.string": {"value": "Hello World!", "in-emit":"#sayhello", "out-emit":"#print,#stopapp"},
   "App.Print": {"on": "#print"}
 }
 ```
@@ -87,8 +87,8 @@ The below configuration starts an HTTP server on port 8080 that serves all files
   "App/HttpServer/api/start": {"type":"HttpScope","scope":"/start", "request-in": "#apirequest", "match": "#action_start", "response":200, "verbose": true},
   "App/HttpServer/api/stop": {"type":"HttpScope","scope":"/stop", "request-in": "#apirequest", "match": "#action_stop", "response":200, "verbose": true},
 
-  "App/String": {"value": "STARTED, woohoo!", "in-emit":"#action_start", "out-emit":"#print"},
-  "App/String": {"value": "STOPPED, boring :/", "in-emit":"#action_stop", "out-emit":"#print"},
+  "App/string": {"value": "STARTED, woohoo!", "in-emit":"#action_start", "out-emit":"#print"},
+  "App/string": {"value": "STOPPED, boring :/", "in-emit":"#action_stop", "out-emit":"#print"},
   "App/Print": {"on": "#print"}
 } 
 ```

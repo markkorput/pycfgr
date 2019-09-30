@@ -1,7 +1,7 @@
 
 {
-  "App": {"started":"#print_cwd", "stop":"#exit", "sleep":0.01},
+  "App": {"started":"#print_list", "stop":"#exit"},
 
-  "App/Cmd": {"execute": "#print_cwd", "cmd": "pwd", "stdoutString":["#print","#exit"]},
+  "App/Cmd": {"execute": "#print_list", "cmd":["ls", "-la", "|", "grep", "log"], "stdoutString":["#print","#exit"]},
   "App/Print": {"on": "#print"}
 }
