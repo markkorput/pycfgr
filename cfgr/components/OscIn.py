@@ -11,7 +11,7 @@ def loadDeps():
     result['osc_server'] = osc_server
     result['dispatcher'] = dispatcher
   except ImportError:
-    logging.getLogger(__name__).warning("failed to load pythonosc dependency; osc_input component will not work")
+    logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscIn component will not work")
 
   return result
 
@@ -51,10 +51,12 @@ class OscIn:
     self.disconnect()
 
   def connect(self):
+    global DEPS
+
     if self.isConnected:
       return False
 
-    if not DEPS:
+    if DEPS == None:
       DEPS = loadDeps()
 
     if not DEPS['osc_server'] or not DEPS['dispatcher']:
