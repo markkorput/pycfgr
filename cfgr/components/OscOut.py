@@ -112,4 +112,4 @@ class OscOut:
     except AttributeError as err:
       print('[OscOut {}:{}] send error: {}'.format(self.host, self.port, str(err)))
     except socket.gaierror as err:
-      print('[OscOut {}:{}] failed send message: {}'.format(self.host, self.port, str(err)))
+      print('[OscOut {}:{}] failed send message {} [{}]: {}'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data)), str(err)))
