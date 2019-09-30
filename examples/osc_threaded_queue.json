@@ -1,0 +1,11 @@
+{
+  "App": {"started":["#start_osc_thread","#startinterval"], "update":"#update_interval", "stop":"#exit"},
+
+  "App/OscOut": {"host": "127.0.0.1", "port": 8000, "in-send": "#send_osc", "verbose":true},
+  "App/OscOut/Thread": {"start": "#start_osc_thread", "action":"#process_queue", "stop":"#stopthread", "verbose":true, "sleeptime":0.03},
+  "App/OscOut/Thread/list": {"append":"#queue_osc", "remove":"#remove_from_queue", "iterate-in":"#process_queue", "iterate-out":["#send_osc","#remove_from_queue"]},
+  "App/OscOut/OscMessage#play": {"address": "/play", "in-send": "#send_play", "out-send": "#queue_osc"},
+
+  "App/Interval": {"start": "#startinterval", "ms":1000, "update":"#update_interval", "action":["#send_play","#count"]},
+  "App/int": {"value":0, "add":"#count", "max":10, "maxExceeded":["#stopthread","#exit"]}
+}
