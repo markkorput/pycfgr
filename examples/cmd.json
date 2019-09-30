@@ -1,0 +1,7 @@
+
+{
+  "App": {"started":"#print_cwd", "stop":"#exit", "sleep":0.01},
+
+  "App/Cmd": {"execute": "#print_cwd", "cmd": "pwd", "stdoutString":["#print","#exit"]},
+  "App/Print": {"on": "#print"}
+}
