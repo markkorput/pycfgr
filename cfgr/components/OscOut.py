@@ -1,5 +1,5 @@
 from cfgr.event import Event
-import socket, logging
+import socket
 
 DEPS = None # {'osc_message_builder': None, 'dispatcher': None}
 
@@ -10,7 +10,8 @@ def loadDeps():
     from pythonosc import udp_client
     result['udp_client'] = udp_client
   except ImportError:
-    logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscOout component will not work")
+    # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscOout component will not work")
+    pass
 
   return result
 
@@ -54,8 +55,14 @@ class OscOut:
       print("[OscOut] no host, can't connect")
       return False
     
-    if not DEPS:
+    if DEPS == None:
       DEPS = loadDeps()
+
+      if not 'udp_client' in DEPS:
+        print("[OscOut] missing OSC dependency")
+
+    if not 'udp_client' in DEPS:
+      return False
 
     # try:
     #     # self.client = OSC.OSCClient()
@@ -66,14 +73,12 @@ class OscOut:
     #     self.logger.error("OSC connection failure: {0}".format(err))
     #     return False
 
-    if not DEPS['udp_client']:
-      print("[OscOut] missing OSC dependency")
-      return False
 
     self.client = DEPS['udp_client'].SimpleUDPClient(host, port)
     self.connected = True
     self.connectEvent(self)
-    self.verbose("[OscOut] connected to {}:{}".format(host, self.port))
+    self.verbose('[OscOut {}:{}] connected'.format(self.host, self.port))
+
     return True
 
   def disconnect(self):
@@ -83,23 +88,24 @@ class OscOut:
     # self.client.close()
     self.client = None
     self.disconnectEvent(self)
-    self.verbose("[OscOut] disconnect from {0}:{1}".format(self.host, self.port))
+    self.verbose('[OscOut {}:{}] disconnected'.format(self.host, self.port))
 
   def verbose(self, msg):
     if self.isVerbose:
       print(msg)
 
   def sendMessage(self, message):
+    addr, data = message
+
     if not self.isConnected():
       if not self.connect():
-        print("[OscOut] failed to connect")
+        print('[OscOut {}:{}] failed to connect; could not send message {} [{}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
         return
-
-    addr, data = message
+    
     try:
       self.client.send_message(addr, data)
       self.messageEvent(message, self)
-      self.verbose('[OscOut] sent {0}:{1} - {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
+      self.verbose('[OscOut {}:{}] sent {} [{}}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
     #     # self.client.send(msg)s
     # except OSC.OSCClientError as err:
     #     pass

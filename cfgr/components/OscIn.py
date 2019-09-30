@@ -1,4 +1,4 @@
-import logging, threading
+import threading
 from cfgr.event import Event
 
 DEPS = None # {'osc_server': None, 'dispatcher': None}
@@ -11,7 +11,8 @@ def loadDeps():
     result['osc_server'] = osc_server
     result['dispatcher'] = dispatcher
   except ImportError:
-    logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscIn component will not work")
+    # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscIn component will not work")
+    pass
 
   return result
 
@@ -59,11 +60,10 @@ class OscIn:
     if DEPS == None:
       DEPS = loadDeps()
 
-    if not DEPS['osc_server'] or not DEPS['dispatcher']:
-      return False
+      if not 'osc_server' in DEPS or not 'dispatcher' in DEPS:
+        print('[OscIn] could not load dependencies')
 
-    if DEPS['osc_server'] == None:
-      print('[OscIn] pythonosc not available')
+    if not 'osc_server' in DEPS or not 'dispatcher' in DEPS:
       return False
 
     disp = DEPS['dispatcher'].Dispatcher()
@@ -92,7 +92,7 @@ class OscIn:
 
     if result:
       # notify
-      self.verbose("[OscIn] server running @ {0}:{1}".format(self.host, str(self.port)))
+      self.verbose("[OscIn {0}:{1}] server running".format(self.host, str(self.port)))
       self.connectedEvent(self)
 
     self.isConnected = result
@@ -106,13 +106,13 @@ class OscIn:
         self.server = None
       self.isConnected = False
       self.disconnectedEvent(self)
-      self.verbose('[OscIn] server stopped @ {0}:{1}'.format(self.host, str(self.port)))
+      self.verbose('[OscIn {0}:{1}] server stopped'.format(self.host, str(self.port)))
 
   def _onOscMsg(self, addr, *args):
     # skip touch osc touch-up events
     # if len(data) == 1 and data[0] == 0.0:
     #     return
-    self.verbose('[OscIn] received {0}:{1} {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
+    self.verbose('[OscIn {0}:{1}] received {2} [{3}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), args))))
     self.messageEvent((addr, args))
     # # trigger events based on incoming messages if configured
     # if addr in self.msgEventMapping:
