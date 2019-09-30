@@ -105,7 +105,7 @@ class OscOut:
     try:
       self.client.send_message(addr, data)
       self.messageEvent(message, self)
-      self.verbose('[OscOut {}:{}] sent {} [{}}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
+      self.verbose('[OscOut {}:{}] sent {} [{}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
     #     # self.client.send(msg)s
     # except OSC.OSCClientError as err:
     #     pass

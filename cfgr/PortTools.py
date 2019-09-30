@@ -92,7 +92,6 @@ class Converter:
         vals = [value]
 
       for val in vals:
-        print('val: {}'.format(val))
         callback(val)
 
     self.event += valueHandler
