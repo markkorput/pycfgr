@@ -99,7 +99,8 @@ class BlockingOSCUDPServer(socketserver.UDPServer):
   """
 
   def __init__(self, server_address, dispatcher):
-    super().__init__(server_address, _UDPHandler)
+    # super(BlockingOSCUDPServer,self).__init__(server_address, _UDPHandler)
+    socketserver.UDPServer.__init__(self, server_address, _UDPHandler)
     self._dispatcher = dispatcher
 
   def verify_request(self, request, client_address):
@@ -121,7 +122,8 @@ class ThreadingOSCUDPServer(
   """
 
   def __init__(self, server_address, dispatcher):
-    super().__init__(server_address, _UDPHandler)
+    # super(ThreadingOSCUDPServer,self).__init__(server_address, _UDPHandler)
+    socketserver.UDPServer.__init__(self, server_address, _UDPHandler)
     self._dispatcher = dispatcher
 
   def verify_request(self, request, client_address):
@@ -144,7 +146,8 @@ class ForkingOSCUDPServer(
   """
 
   def __init__(self, server_address, dispatcher):
-    super().__init__(server_address, _UDPHandler)
+    # super(ForkingOSCUDPServer,self).__init__(server_address, _UDPHandler)
+    socketserver.UDPServer.__init__(self, server_address, _UDPHandler)
     self._dispatcher = dispatcher
 
   def verify_request(self, request, client_address):
