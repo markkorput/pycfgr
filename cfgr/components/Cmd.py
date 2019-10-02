@@ -2,6 +2,14 @@ from cfgr.event import Event
 # import os
 import subprocess
 
+UnknownCommandError = None
+try: # python3
+  UnknownCommandError = FileNotFoundError
+except NameError:
+  # python2
+  UnknownCommandError = OSError
+
+
 class Cmd:
   @staticmethod
   def cfgr(builder):
@@ -37,7 +45,7 @@ class Cmd:
     try:
       
       p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
-    except FileNotFoundError as err:
+    except UnknownCommandError as err:
       print("[Cmd {}] err: {}".format(self.cmd, str(err)))
       p = None
     except Exception as err:

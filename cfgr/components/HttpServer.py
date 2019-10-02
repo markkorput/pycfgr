@@ -1,12 +1,11 @@
 import threading, time, socket, os, re
 from cfgr.event import Event
 
-import http.client
-from http.server import HTTPServer, CGIHTTPRequestHandler #SimpleHTTPRequestHandler
 
+
+# import urllib.parse
 urlsplit = None
 urlunsplit = None
-
 try: # python3
   import urllib.parse # python3  
   urlsplit = urllib.parse.urlsplit
@@ -15,17 +14,42 @@ except ImportError:
   urlsplit = None
   urlunsplit = None
 
-if urlsplit == None or urlunsplit == None:
   try: #python2
     import urlparse # python2
     urlsplit = urlparse.urlsplit
     urlunsplit = urlparse.urlunsplit
   except ImportError:
-    urlsplit = None
-    urlunsplit = None
+    print('[HttpServer] could not load url parsing dependencies')
 
-if urlsplit == None or urlunsplit == None:
-  print('[HttpServer] failed to load url parse dependencies')
+
+# import http.client
+HTTPSConnection = None
+try: # python 3
+  import http.client
+  HTTPSConnection = http.client.HTTPConnection
+except ImportError:
+  try: # python 2
+    import httplib
+    HTTPSConnection = httplib.HTTPSConnection
+  except ImportError:
+    print('[HttpServer] could not load http client dependencies')
+
+
+# from http.server import HTTPServer, CGIHTTPRequestHandler #SimpleHTTPRequestHandler
+HTTPServer = None
+CGIHTTPRequestHandler = None
+try:
+  import http.server
+  HTTPServer = http.server.HTTPServer
+  CGIHTTPRequestHandler = http.server.CGIHTTPRequestHandler
+except ImportError:
+  try:
+    import BaseHTTPServer
+    import CGIHTTPServer
+    HTTPServer = BaseHTTPServer.HTTPServer
+    CGIHTTPRequestHandler = CGIHTTPServer.CGIHTTPRequestHandler
+  except ImportError:
+    print('[HttpServer] Could not load server dependencies')
 
 class HttpRequest:
   def __init__(self, path, handler, method='GET'):
@@ -152,7 +176,7 @@ class HttpServer(threading.Thread):
     self.verbose('[HttpServer] sending GET request to stop HTTP server from blocking...')
 
     try:
-        connection = http.client.HTTPSConnection("127.0.0.1", self.port)
+        connection = HTTPSConnection("127.0.0.1", self.port)
         connection.request('HEAD', '/')
         connection.getresponse()
     except socket.error:

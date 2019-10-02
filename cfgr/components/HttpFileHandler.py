@@ -1,6 +1,20 @@
 from cfgr.event import Event
-from urllib.parse import urlparse
 import os.path, re
+
+
+# from urllib.parse import urlparse
+urlparse = None
+try: # python3
+  import urllib.parse # python3  
+  urlparse = urllib.parse.urlparse
+except ImportError:
+  try: #python2
+    import urlparse # python2
+    urlparse = urlparse.urlparse
+  except ImportError:
+    print('[HttpScope] failed to load url parse dependencies')
+    urlparse = None
+
 
 class HttpFileHandler:
   @staticmethod
