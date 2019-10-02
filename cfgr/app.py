@@ -2,6 +2,7 @@ import sys
 from optparse import OptionParser
 from cfgr import Runtime, Json
 from .discover import addAllTypes
+from cfgr.components.app import App
 
 DEFAULT_DATA_PATH = 'cfgr.json'
 DEFAULT_COMPONENT = 'App'
@@ -15,12 +16,11 @@ def main(dataPath=None, componentId=None, startEvent=None, verbose=False, custom
   loader = Json.Loader(runtime=runtime, file=dataPath if dataPath else DEFAULT_DATA_PATH, verbose=verbose)
 
   # instantiate our root component (including the complete sub-hierarchy)
-  isDefaultApp = componentId == None
-  inst = loader.create(DEFAULT_COMPONENT if isDefaultApp else componentId, recursive=True)
-  app = inst.object if isDefaultApp else None
+  rootInstance = loader.create(DEFAULT_COMPONENT if componentId == None else componentId, recursive=True)
+  app = rootInstance.object if isinstance(rootInstance.object, App) else None
 
   # if we've instantiated the default App component, give it its start signal
-  if isDefaultApp:
+  if app:
     app.start()
 
   # if we've received a startEvent command line option; trigger the specified event(s)
@@ -29,12 +29,12 @@ def main(dataPath=None, componentId=None, startEvent=None, verbose=False, custom
       e.fire()
 
   try:
-    while not isDefaultApp or app.isActive:
-      if isDefaultApp:
+    while app == None or app.isActive:
+      if app:
         app.update()
   except KeyboardInterrupt:
     print('KeyboardInterrupt, stopping.')
-    if isDefaultApp:
+    if app:
       app.stop()
 
   # print('Done.')
