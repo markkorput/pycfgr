@@ -1,9 +1,31 @@
 import threading, time, socket, os, re
-import urllib.parse
 from cfgr.event import Event
 
 import http.client
 from http.server import HTTPServer, CGIHTTPRequestHandler #SimpleHTTPRequestHandler
+
+urlsplit = None
+urlunsplit = None
+
+try: # python3
+  import urllib.parse # python3  
+  urlsplit = urllib.parse.urlsplit
+  urlunsplit = urllib.parse.urlunsplit
+except ImportError:
+  urlsplit = None
+  urlunsplit = None
+
+if urlsplit == None or urlunsplit == None:
+  try: #python2
+    import urlparse # python2
+    urlsplit = urlparse.urlsplit
+    urlunsplit = urlparse.urlunsplit
+  except ImportError:
+    urlsplit = None
+    urlunsplit = None
+
+if urlsplit == None or urlunsplit == None:
+  print('[HttpServer] failed to load url parse dependencies')
 
 class HttpRequest:
   def __init__(self, path, handler, method='GET'):
@@ -21,9 +43,13 @@ class HttpRequest:
     self.handler.respondWithFile(filePath)
 
   def unscope(self, scope):
-    parts = urllib.parse.urlsplit(self.path)
+    if urlsplit == None or urlunsplit == None:
+      print('[HttpScope] unscope not working')
+      return HttpRequest(self.path, self.handler, method=self.method)
+
+    parts = urlsplit(self.path)
     newpath = re.sub('^{}'.format(scope), '', parts.path)
-    unscopedreqpath = urllib.parse.urlunsplit((parts.scheme, parts.netloc, newpath, parts.query, parts.fragment))
+    unscopedreqpath = urlunsplit((parts.scheme, parts.netloc, newpath, parts.query, parts.fragment))
     return HttpRequest(unscopedreqpath, self.handler, method=self.method)
 
 def createRequestHandler(requestCallback, verbose=False):
