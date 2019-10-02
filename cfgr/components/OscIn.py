@@ -15,6 +15,11 @@ def loadDeps():
     from cfgr.embeds.python2osc import osc_server
     result['osc_server'] = osc_server
     result['dispatcher'] = dispatcher
+  except Exception:
+    from cfgr.embeds.python2osc import dispatcher
+    from cfgr.embeds.python2osc import osc_server
+    result['osc_server'] = osc_server
+    result['dispatcher'] = dispatcher
 
     # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscIn component will not work")
     pass

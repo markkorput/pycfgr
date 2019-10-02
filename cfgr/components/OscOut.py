@@ -16,6 +16,13 @@ def loadDeps():
     except ImportError:
       # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscOout component will not work")
       pass
+  except Exception:
+    try:
+      from cfgr.embeds.python2osc import udp_client
+      result['udp_client'] = udp_client
+    except ImportError:
+      # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscOout component will not work")
+      pass
 
   return result
 
