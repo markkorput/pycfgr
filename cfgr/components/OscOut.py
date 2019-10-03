@@ -11,15 +11,17 @@ def loadDeps():
     result['udp_client'] = udp_client
   except ImportError:
     try:
-      from cfgr.embeds.python2osc import udp_client
-      result['udp_client'] = udp_client
+      from cfgr.embeds.oscpy.client import OSCClient
+      result['OSCClient'] = OSCClient
     except ImportError:
       # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscOout component will not work")
       pass
   except Exception:
     try:
-      from cfgr.embeds.python2osc import udp_client
-      result['udp_client'] = udp_client
+      # from cfgr.embeds.python2osc import udp_client
+      # result['udp_client'] = udp_client
+      from cfgr.embeds.oscpy.client import OSCClient
+      result['OSCClient'] = OSCClient
     except ImportError:
       # logging.getLogger(__name__).warning("failed to load pythonosc dependency; OscOout component will not work")
       pass
@@ -69,10 +71,10 @@ class OscOut:
     if DEPS == None:
       DEPS = loadDeps()
 
-      if not 'udp_client' in DEPS:
+      if not 'udp_client' in DEPS and not 'OSCClient' in DEPS:
         print("[OscOut] missing OSC dependency")
 
-    if not 'udp_client' in DEPS:
+    if not 'udp_client' in DEPS and not 'OSCClient' in DEPS:
       return False
 
     # try:
@@ -84,11 +86,17 @@ class OscOut:
     #     self.logger.error("OSC connection failure: {0}".format(err))
     #     return False
 
+    if 'udp_client' in DEPS:
+      self.client = DEPS['udp_client'].SimpleUDPClient(host, port)
+      self.connected = True
+      self.connectEvent(self)
+      self.verbose('[OscOut {}:{}] connected'.format(self.host, self.port))
 
-    self.client = DEPS['udp_client'].SimpleUDPClient(host, port)
-    self.connected = True
-    self.connectEvent(self)
-    self.verbose('[OscOut {}:{}] connected'.format(self.host, self.port))
+    if 'OSCClient' in DEPS:
+      self.client = DEPS['OSCClient'](host, port)
+      self.connected = True
+      self.connectEvent(self)
+      self.verbose('[OscOut {}:{}] connected using OSCClient'.format(self.host, self.port))
 
     return True
 
@@ -113,6 +121,18 @@ class OscOut:
         print('[OscOut {}:{}] failed to connect; could not send message {} [{}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
         return
     
+
+    if 'OSCClient' in DEPS:
+      try:
+        self.client.send_message(addr.encode('ascii'), data)
+        self.messageEvent(message, self)
+        self.verbose('[OscOut {}:{}] sent {} using OSCClient [{}]'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data))))
+      except AttributeError as err:
+        print('[OscOut {}:{}] send error: {}'.format(self.host, self.port, str(err)))
+      except socket.gaierror as err:
+        print('[OscOut {}:{}] failed send message {} [{}]: {}'.format(self.host, self.port, addr, ", ".join(map(lambda x: str(x), data)), str(err)))
+      return
+
     try:
       self.client.send_message(addr, data)
       self.messageEvent(message, self)
