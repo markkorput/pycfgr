@@ -12,16 +12,20 @@ class int:
     builder.addInput('emit').signal_to_method(lambda obj: obj.emit)
     builder.addInput('add').int_to_method(lambda obj: obj.add)
     builder.addInput('max').int_to_method(lambda obj: obj.setMax)
+    builder.addInput('max').int_to_method(lambda obj: obj.setMax)
+    builder.addInput('compareValue').int_to_method(lambda obj: obj.compareValue)
 
     # outputs
     builder.addOutput('emit').from_event(lambda obj: obj.emitEvent)
     builder.addOutput('maxExceeded').from_event(lambda obj: obj.maxExceededEvent)
+    builder.addOutput('compareValueIsEqual').from_event(lambda obj: obj.compareValueIsEqualEvent)
 
   def __init__(self):
     self.value = None
     self.max = None
     self.emitEvent = Event()
     self.maxExceededEvent = Event()
+    self.compareValueIsEqualEvent = Event()
 
   def setValue(self, v):
     if self.max != None:
@@ -41,3 +45,7 @@ class int:
 
   def emit(self):
     self.emitEvent(self.value)
+
+  def compareValue(self, v):
+    if v == self.value:
+      self.compareValueIsEqualEvent()
