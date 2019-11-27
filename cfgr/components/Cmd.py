@@ -1,5 +1,5 @@
 from cfgr.event import Event
-# import os
+import os
 import subprocess
 
 UnknownCommandError = None
@@ -17,6 +17,7 @@ class Cmd:
     builder.addInput('execute').signal_to_method(lambda obj: obj.execute)
     builder.addInput('cmd').list_to_method(lambda obj: obj.setCmd)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
+    builder.addInput('background').bool_to_method(lambda obj: obj.setBackground)
 
     # outputs
     builder.addOutput('executing').from_event(lambda obj: obj.executingEvent)
@@ -27,6 +28,7 @@ class Cmd:
   def __init__(self):
     self.cmd = None
     self.isVerbose = False
+    self.inBackground = False
 
     self.executingEvent = Event()
     self.executedEvent = Event()
@@ -36,25 +38,30 @@ class Cmd:
   def setCmd(self, v):
     self.cmd = v
 
+  def setBackground(self, v):
+    self.inBackground = v
+
   def execute(self):
     self.verbose('[Cmd {}] executing'.format(self.cmd))
     self.executingEvent()
-    # os.system(self.cmd)
 
-    p = None
-    try:
-      
-      p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
-    except UnknownCommandError as err:
-      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+    if self.inBackground:
+      os.system(self.cmd)
+    else:
       p = None
-    except Exception as err:
-      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
-      p = None
+      try:
+        
+        p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
+      except UnknownCommandError as err:
+        print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+        p = None
+      except Exception as err:
+        print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+        p = None
 
-    if p == None:
-      # TODO fire failure event?
-      return
+      if p == None:
+        # TODO fire failure event?
+        return
 
     self.executedEvent()
 
