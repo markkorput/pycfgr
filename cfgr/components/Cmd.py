@@ -39,29 +39,32 @@ class Cmd:
     self.cmd = v
 
   def setBackground(self, v):
+    # print('setBG: {}'.format(v))
     self.inBackground = v
 
   def execute(self):
-    self.verbose('[Cmd {}] executing'.format(self.cmd))
+    self.verbose('[Cmd {}] executing{}'.format(self.cmd, ' in background' if self.inBackground else ''))
     self.executingEvent()
 
     if self.inBackground:
-      os.system(self.cmd)
-    else:
-      p = None
-      try:
-        
-        p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
-      except UnknownCommandError as err:
-        print("[Cmd {}] err: {}".format(self.cmd, str(err)))
-        p = None
-      except Exception as err:
-        print("[Cmd {}] err: {}".format(self.cmd, str(err)))
-        p = None
+      os.system(' '.join(self.cmd))
+      self.executedEvent()
+      return
 
-      if p == None:
-        # TODO fire failure event?
-        return
+    p = None
+    try:
+      
+      p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
+    except UnknownCommandError as err:
+      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+      p = None
+    except Exception as err:
+      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+      p = None
+
+    if p == None:
+      # TODO fire failure event?
+      return
 
     self.executedEvent()
 
