@@ -1,6 +1,6 @@
 from cfgr.event import Event
 import os.path, re
-
+import cgi
 
 # from urllib.parse import urlparse
 urlparse = None
@@ -24,6 +24,8 @@ class HttpFileHandler:
     builder.addInput('response').to_method(lambda obj: obj.setResponse)
     builder.addInput('saveTo').string_to_method(lambda obj: obj.setSaveTo)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
+    builder.addInput('keepExtension').bool_to_method(lambda obj: obj.setKeepExtension)
+    builder.addInput('fileFormName').string_to_method(lambda obj: obj.setFileFormName)
 
     # outputs
     #builder.addOutput('match').from_event(lambda obj: obj.matchEvent)
@@ -33,6 +35,8 @@ class HttpFileHandler:
     self.responseCode = None
     self.isVerbose = False
     self.saveTo = None
+    self.keepExtension = False
+    self.fileFormName = 'file'
 
     self.savedEvent = Event()
 
@@ -42,7 +46,37 @@ class HttpFileHandler:
   def setSaveTo(self, val):
     self.saveTo = os.path.abspath(os.path.expanduser(val)) #val
 
+  def setKeepExtension(self, val):
+    self.keepExtension = val
+
+  def setFileFormName(self, val):
+    self.fileFormName = val
+
   def processRequest(self, req):
+    form = cgi.FieldStorage(
+        fp=req.handler.rfile, #self.rfile,
+        headers=req.handler.headers, #self.headers,
+        environ={'REQUEST_METHOD':'PUT', # 'POST',
+                  'CONTENT_TYPE':req.handler.headers['Content-Type'],
+                  })
+
+    formfile = form[self.fileFormName]
+    filename = formfile.filename
+    data = formfile.file.read()
+
+    filepath = "data/%s" % filename
+    open(filepath, "wb").write(data)
+    print(req.handler.headers['content-length'])
+
+    # req.handler.respond("uploaded %s, thanks")
+    req.handler.send_response(201, 'Created')
+    req.handler.end_headers()    
+    reply_body = 'Saved "%s"\n' % filename
+    req.handler.wfile.write(reply_body.encode('utf-8'))
+
+    self.savedEvent(filepath)
+
+  def processRequest_OLD(self, req):
     """Saves a file following a HTTP PUT request"""
     # https://f-o.org.uk/2017/receiving-files-over-http-with-python.html
 
@@ -61,6 +95,13 @@ class HttpFileHandler:
       return
 
     filename = self.saveTo # if self.saveTo else os.path.basename(req.path)
+
+    if self.keepExtension:
+      print("let's keep extension")
+      print(req.handler.headers)
+      print("request handler:")
+      print(req.handler)
+
     file_length = int(req.handler.headers['Content-Length'])
     with open(filename, 'wb') as output_file:
       output_file.write(req.handler.rfile.read(file_length))
