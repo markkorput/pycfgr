@@ -14,7 +14,7 @@ class Cmd:
   @staticmethod
   def cfgr(builder):
     # inputs
-    builder.addInput('execute').signal_to_method(lambda obj: obj.execute)
+    builder.addInput('execute').to_method(lambda obj: obj.execute)
     builder.addInput('cmd').list_to_method(lambda obj: obj.setCmd)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
     builder.addInput('background').bool_to_method(lambda obj: obj.setBackground)
@@ -42,24 +42,43 @@ class Cmd:
     # print('setBG: {}'.format(v))
     self.inBackground = v
 
-  def execute(self):
+  def convertArgs(self, argValue, args):
+    if not argValue.startswith('$'):
+      return argValue
+
+    v = argValue.replace('$','')
+    try:
+      v = args[int(v)]
+    except ValueError:
+      v = argValue
+    except IndexError:
+      v = argValue
+    except:
+      v = argValue
+
+    return v
+
+  def execute(self, *args, **kwargs):
     self.verbose('[Cmd {}] executing{}'.format(self.cmd, ' in background' if self.inBackground else ''))
     self.executingEvent()
 
+    cmd = list(map(lambda x: self.convertArgs(x, args), self.cmd))
+
+    self.verbose('[Cmd] command with converted args: {}'.format(cmd))
+
     if self.inBackground:
-      os.system(' '.join(self.cmd))
+      os.system(' '.join(cmd))
       self.executedEvent()
       return
 
     p = None
     try:
-      
-      p = subprocess.Popen(self.cmd if type(self.cmd) == type([]) else [self.cmd], stdout=subprocess.PIPE)
+      p = subprocess.Popen(cmd if type(cmd) == type([]) else [cmd], stdout=subprocess.PIPE)
     except UnknownCommandError as err:
-      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+      print("[Cmd {}] err: {}".format(cmd, str(err)))
       p = None
     except Exception as err:
-      print("[Cmd {}] err: {}".format(self.cmd, str(err)))
+      print("[Cmd {}] err: {}".format(cmd, str(err)))
       p = None
 
     if p == None:
@@ -71,10 +90,10 @@ class Cmd:
     # do we have listeners that are interested in stdout?
     if len(self.stdoutEvent) > 0 or len(self.stdoutStringEvent) > 0: 
       out = p.stdout.read()
-      self.verbose('[Cmd {}] stdout: {}'.format(self.cmd, out))
+      self.verbose('[Cmd {}] stdout: {}'.format(cmd, out))
       self.stdoutEvent(out)
       stripped = out.decode('ascii').strip()
-      # self.verbose('[Cmd {}] stdoutString: {}'.format(self.cmd, stripped))
+      # self.verbose('[Cmd {}] stdoutString: {}'.format(cmd, stripped))
       self.stdoutStringEvent(stripped)
 
   def setVerbose(self, v):
