@@ -23,8 +23,9 @@ class HttpFileHandler:
     builder.addInput('request').to_method(lambda obj: obj.processRequest)
     builder.addInput('response').to_method(lambda obj: obj.setResponse)
     builder.addInput('saveTo').string_to_method(lambda obj: obj.setSaveTo)
+    builder.addInput('saveToFolder').string_to_method(lambda obj: obj.setSaveToFolder)
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
-    builder.addInput('keepExtension').bool_to_method(lambda obj: obj.setKeepExtension)
+    # builder.addInput('keepExtension').bool_to_method(lambda obj: obj.setKeepExtension)
     builder.addInput('fileFormName').string_to_method(lambda obj: obj.setFileFormName)
 
     # outputs
@@ -35,7 +36,8 @@ class HttpFileHandler:
     self.responseCode = None
     self.isVerbose = False
     self.saveTo = None
-    self.keepExtension = False
+    self.saveToFolder = None
+    # self.keepExtension = False
     self.fileFormName = 'file'
 
     self.savedEvent = Event()
@@ -46,8 +48,11 @@ class HttpFileHandler:
   def setSaveTo(self, val):
     self.saveTo = os.path.abspath(os.path.expanduser(val)) #val
 
-  def setKeepExtension(self, val):
-    self.keepExtension = val
+  def setSaveToFolder(self, val):
+    self.saveToFolder = os.path.abspath(os.path.expanduser(val)) #val
+
+  # def setKeepExtension(self, val):
+  #   self.keepExtension = val
 
   def setFileFormName(self, val):
     self.fileFormName = val
@@ -63,10 +68,18 @@ class HttpFileHandler:
     formfile = form[self.fileFormName]
     filename = formfile.filename
     data = formfile.file.read()
+    file_length = req.handler.headers['content-length']
 
-    filepath = "data/%s" % filename
+    filepath = "./%s" % filename
+    if self.saveTo:
+      filepath = self.saveTo
+    if self.saveToFolder:
+      filepath = "%s/%s" % (self.saveToFolder, filename)
+    else:
+      print("WARNING, no saveTo or saveToFolder option specified, saving to default path: %s" % filepath)
+
     open(filepath, "wb").write(data)
-    print(req.handler.headers['content-length'])
+    # print(req.handler.headers['content-length'])
 
     # req.handler.respond("uploaded %s, thanks")
     req.handler.send_response(201, 'Created')
@@ -74,6 +87,7 @@ class HttpFileHandler:
     reply_body = 'Saved "%s"\n' % filename
     req.handler.wfile.write(reply_body.encode('utf-8'))
 
+    self.verbose('[HttpFileHandler] wrote {} bytes to: {}'.format(file_length, filepath))
     self.savedEvent(filepath)
 
   def processRequest_OLD(self, req):
@@ -96,11 +110,11 @@ class HttpFileHandler:
 
     filename = self.saveTo # if self.saveTo else os.path.basename(req.path)
 
-    if self.keepExtension:
-      print("let's keep extension")
-      print(req.handler.headers)
-      print("request handler:")
-      print(req.handler)
+    # if self.keepExtension:
+    #   print("let's keep extension")
+    #   print(req.handler.headers)
+    #   print("request handler:")
+    #   print(req.handler)
 
     file_length = int(req.handler.headers['Content-Length'])
     with open(filename, 'wb') as output_file:
