@@ -57,6 +57,11 @@ class HttpRequest:
     self.handler = handler
     self.method = method
 
+    parts = urlsplit(self.path)
+    # newpath = re.sub('^{}'.format(scope), '', parts.path)
+    # unscopedreqpath = urlunsplit((parts.scheme, parts.netloc, newpath, parts.query, parts.fragment))
+    self.query = parts.query
+
   def respondWithCode(self, code):
     self.handler.respond(code)
   
