@@ -27,6 +27,7 @@ class HttpFileHandler:
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
     # builder.addInput('keepExtension').bool_to_method(lambda obj: obj.setKeepExtension)
     builder.addInput('fileFormName').string_to_method(lambda obj: obj.setFileFormName)
+    
 
     # outputs
     #builder.addOutput('match').from_event(lambda obj: obj.matchEvent)
@@ -39,6 +40,10 @@ class HttpFileHandler:
     self.saveToFolder = None
     # self.keepExtension = False
     self.fileFormName = 'file'
+    # for big files; save the data file in batches, don't try to read big file all at once
+    self.batchSize = None # TODO: make configurable
+    self.defaultBatchSize = 512 * 1024 # 512kb
+    self.defaultBatchSizeLimit = 512 * 1024 # 512kb
 
     self.savedEvent = Event()
 
@@ -67,9 +72,9 @@ class HttpFileHandler:
 
     formfile = form[self.fileFormName]
     filename = formfile.filename
-    data = formfile.file.read()
-    file_length = req.handler.headers['content-length']
+    file_length = int(req.handler.headers['content-length'])
 
+    # Destination
     filepath = "./%s" % filename
     if self.saveTo:
       filepath = self.saveTo
@@ -78,7 +83,27 @@ class HttpFileHandler:
     else:
       print("WARNING, no saveTo or saveToFolder option specified, saving to default path: %s" % filepath)
 
-    open(filepath, "wb").write(data)
+    #  Batches?
+    batchsize = self.batchSize
+    if not batchsize and file_length > self.defaultBatchSizeLimit:
+      batchsize = self.defaultBatchSize
+      self.verbose('Dfaulting to batch size {} because of large file size ({})'.format(batchsize, file_length))
+
+    if not batchsize:
+      data = formfile.file.read()
+      open(filepath, "wb").write(data)
+    else:
+      with open(filepath, "wb") as f:
+        ttl = 0
+        while ttl < file_length:
+          batch = batchsize if file_length - ttl >= batchsize else file_length - ttl
+          data = formfile.file.read(batch)
+          f.write(data)
+          ttl += batch
+          self.verbose('[HttpFileHandler] saved {} bytes (total {} of {})'.format(batch, ttl, file_length))
+
+
+        
     # print(req.handler.headers['content-length'])
 
     # req.handler.respond("uploaded %s, thanks")
