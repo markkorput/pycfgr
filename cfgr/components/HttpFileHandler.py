@@ -27,7 +27,7 @@ class HttpFileHandler:
     builder.addInput('verbose').bool_to_method(lambda obj: obj.setVerbose)
     # builder.addInput('keepExtension').bool_to_method(lambda obj: obj.setKeepExtension)
     builder.addInput('fileFormName').string_to_method(lambda obj: obj.setFileFormName)
-    
+    builder.addInput('whitespaceReplacement').string_to_method(lambda obj: obj.setWhitespaceReplacement) # set to blank to disable
 
     # outputs
     #builder.addOutput('match').from_event(lambda obj: obj.matchEvent)
@@ -38,6 +38,7 @@ class HttpFileHandler:
     self.isVerbose = False
     self.saveTo = None
     self.saveToFolder = None
+    self.whitespaceReplacement = '_' # TODO; make configurable?
     # self.keepExtension = False
     self.fileFormName = 'file'
     # for big files; save the data file in batches, don't try to read big file all at once
@@ -56,6 +57,9 @@ class HttpFileHandler:
   def setSaveToFolder(self, val):
     self.saveToFolder = os.path.abspath(os.path.expanduser(val)) #val
 
+  def setWhitespaceReplacement(self, v):
+    self.whitespaceReplacement = v
+
   # def setKeepExtension(self, val):
   #   self.keepExtension = val
 
@@ -70,9 +74,16 @@ class HttpFileHandler:
                   'CONTENT_TYPE':req.handler.headers['Content-Type'],
                   })
 
+    if not self.fileFormName in form:
+      print('[HttpFileHandler] file not found in form data: {}'.format(self.fileFormName))
+      return
+
     formfile = form[self.fileFormName]
     filename = formfile.filename
     file_length = int(req.handler.headers['content-length'])
+
+    if self.whitespaceReplacement:
+      filename = filename.replace(' ', self.whitespaceReplacement)
 
     # Destination
     filepath = "./%s" % filename
